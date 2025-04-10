@@ -37,17 +37,22 @@ export default function FlightSearch() {
   const [showOriginOptions, setShowOriginOptions] = useState<boolean>(false);
   const [showDestinationOptions, setShowDestinationOptions] = useState<boolean>(false);
   
-  // Sample airports
+  // Worldwide airports
   const airports = [
     "New York (JFK)",
+    "New York (LGA)",
     "London (LHR)",
+    "London (LGW)",
+    "London (STN)",
     "Paris (CDG)",
+    "Paris (ORY)",
     "Dubai (DXB)",
     "Tokyo (HND)",
+    "Tokyo (NRT)",
     "Singapore (SIN)",
     "Los Angeles (LAX)",
     "Chicago (ORD)",
-    "Istanbul (IST)",
+    "Istanbul (IST),",
     "Hong Kong (HKG)",
     "Bangkok (BKK)",
     "Sydney (SYD)",
@@ -55,10 +60,85 @@ export default function FlightSearch() {
     "Madrid (MAD)",
     "Cairo (CAI)",
     "Berlin (BER)",
+    "Berlin (TXL)",
     "Rome (FCO)",
     "Beijing (PEK)",
+    "Beijing (PKX)",
     "Amsterdam (AMS)",
-    "Frankfurt (FRA)"
+    "Frankfurt (FRA)",
+    "Toronto (YYZ)",
+    "Sao Paulo (GRU)",
+    "Mexico City (MEX)",
+    "Johannesburg (JNB)",
+    "Cape Town (CPT)",
+    "Mumbai (BOM)",
+    "Seoul (ICN)",
+    "Shanghai (PVG)",
+    "Melbourne (MEL)",
+    "San Francisco (SFO)",
+    "Miami (MIA)",
+    "Atlanta (ATL)",
+    "Dallas (DFW)",
+    "Munich (MUC)",
+    "Barcelona (BCN)",
+    "Zurich (ZRH)",
+    "Brussels (BRU)",
+    "Moscow (SVO)",
+    "Moscow (DME)",
+    "Vienna (VIE)",
+    "Copenhagen (CPH)",
+    "Stockholm (ARN)",
+    "Oslo (OSL)",
+    "Helsinki (HEL)",
+    "Athens (ATH)",
+    "Lisbon (LIS)",
+    "Dublin (DUB)",
+    "Warsaw (WAW)",
+    "Prague (PRG)",
+    "Budapest (BUD)",
+    "Abu Dhabi (AUH)",
+    "Doha (DOH)",
+    "Riyadh (RUH)",
+    "Jeddah (JED)",
+    "Kuwait (KWI)",
+    "Muscat (MCT)",
+    "Bahrain (BAH)",
+    "Tel Aviv (TLV)",
+    "Amman (AMM)",
+    "Beirut (BEY)",
+    "Cairo (CAI)",
+    "Casablanca (CMN)",
+    "Tunis (TUN)",
+    "Algiers (ALG)",
+    "Nairobi (NBO)",
+    "Lagos (LOS)",
+    "Addis Ababa (ADD)",
+    "Mauritius (MRU)",
+    "Seychelles (SEZ)",
+    "Manila (MNL)",
+    "Jakarta (CGK)",
+    "Kuala Lumpur (KUL)",
+    "Ho Chi Minh (SGN)",
+    "Hanoi (HAN)",
+    "Bali (DPS)",
+    "Taipei (TPE)",
+    "Auckland (AKL)",
+    "Wellington (WLG)",
+    "Fiji (NAN)",
+    "Tahiti (PPT)",
+    "Honolulu (HNL)",
+    "Vancouver (YVR)",
+    "Montreal (YUL)",
+    "Calgary (YYC)",
+    "Rio de Janeiro (GIG)",
+    "Buenos Aires (EZE)",
+    "Lima (LIM)",
+    "Santiago (SCL)",
+    "Bogota (BOG)",
+    "Panama City (PTY)",
+    "San Jose (SJO)",
+    "Cancun (CUN)",
+    "Havana (HAV)"
   ];
 
   // Dropdown options
@@ -202,7 +282,7 @@ export default function FlightSearch() {
             </div>
             <Input
               type="text"
-              className="pl-10 pr-16 text-gray-800"
+              className="pl-10 pr-16 text-black"
               placeholder={t("From: City or Airport", "من: المدينة أو المطار")}
               value={origin}
               onChange={(e) => handleSearchOrigin(e.target.value)}
@@ -247,7 +327,7 @@ export default function FlightSearch() {
             </div>
             <Input
               type="text"
-              className="pl-10 pr-16 text-gray-800"
+              className="pl-10 pr-16 text-black"
               placeholder={t("To: City or Airport", "إلى: المدينة أو المطار")}
               value={destination}
               onChange={(e) => handleSearchDestination(e.target.value)}

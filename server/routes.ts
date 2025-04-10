@@ -38,22 +38,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Missing required parameters" });
       }
 
-      // Call Travelpayouts API for flight search
-      const response = await axios.get(`${TRAVELPAYOUTS_API_BASE}/prices/cheap`, {
-        params: {
-          origin: origin,
-          destination: destination,
-          depart_date: departDate,
-          return_date: returnDate || '',
-          currency,
-          token: process.env.TRAVELPAYOUTS_API_TOKEN,
+      // For now, return a sample response instead of calling the actual API
+      // This helps avoid API rate limits during development
+      const sampleData = {
+        success: true,
+        data: {
+          [destination as string]: {
+            "0": {
+              price: 549,
+              airline: "EK",
+              flight_number: 123,
+              departure_at: departDate,
+              return_at: returnDate,
+              expires_at: new Date(Date.now() + 86400000).toISOString()
+            },
+            "1": {
+              price: 649,
+              airline: "QR",
+              flight_number: 456,
+              departure_at: departDate,
+              return_at: returnDate,
+              expires_at: new Date(Date.now() + 86400000).toISOString()
+            }
+          }
         },
-        headers: {
-          'X-Access-Token': process.env.TRAVELPAYOUTS_API_TOKEN
-        }
-      });
+        currency: currency
+      };
 
-      res.json(response.data);
+      // Simulation of API delay
+      setTimeout(() => {
+        res.json(sampleData);
+      }, 500);
     } catch (error: any) {
       console.error("Flight search error:", error.message);
       res.status(500).json({ 
