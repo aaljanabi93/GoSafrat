@@ -12,6 +12,7 @@ import {
   sendVerificationEmail,
   sendPasswordResetEmail 
 } from "./services/email-service";
+import { config, buildUrl } from "./config";
 
 declare global {
   namespace Express {
@@ -108,12 +109,8 @@ export function setupAuth(app: Express) {
       const verificationExpiresIn = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
       await storage.setVerificationToken(user.id, token, verificationExpiresIn);
       
-      // Get base URL for link construction
-      // Use gosafrat.com in production, otherwise use the request host
-      const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-      const baseUrl = process.env.NODE_ENV === 'production' 
-        ? 'https://gosafrat.com'
-        : `${protocol}://${req.get('host')}`;
+      // Get base URL for link construction from config
+      const baseUrl = config.appUrl;
       
       // Send verification email asynchronously
       sendVerificationEmail(user, token, baseUrl)
@@ -298,12 +295,8 @@ export function setupAuth(app: Express) {
       const verificationExpiresIn = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
       await storage.setVerificationToken(req.user.id, token, verificationExpiresIn);
       
-      // Get base URL for link construction
-      // Use gosafrat.com in production, otherwise use the request host
-      const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-      const baseUrl = process.env.NODE_ENV === 'production' 
-        ? 'https://gosafrat.com'
-        : `${protocol}://${req.get('host')}`;
+      // Get base URL for link construction from config
+      const baseUrl = config.appUrl;
       
       // Send verification email
       const sent = await sendVerificationEmail(req.user, token, baseUrl);
@@ -347,12 +340,8 @@ export function setupAuth(app: Express) {
       const resetExpiresIn = 60 * 60 * 1000; // 1 hour in milliseconds
       await storage.setResetToken(user.id, token, resetExpiresIn);
       
-      // Get base URL for link construction
-      // Use gosafrat.com in production, otherwise use the request host
-      const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-      const baseUrl = process.env.NODE_ENV === 'production' 
-        ? 'https://gosafrat.com'
-        : `${protocol}://${req.get('host')}`;
+      // Get base URL for link construction from config
+      const baseUrl = config.appUrl;
       
       // Send password reset email
       sendPasswordResetEmail(user, token, baseUrl)

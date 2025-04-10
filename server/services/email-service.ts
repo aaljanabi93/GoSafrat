@@ -1,6 +1,7 @@
 import sgMail from '@sendgrid/mail';
 import { User } from '@shared/schema';
 import crypto from 'crypto';
+import { config } from '../config';
 
 // Initialize SendGrid with API key
 if (!process.env.SENDGRID_API_KEY) {
@@ -8,8 +9,8 @@ if (!process.env.SENDGRID_API_KEY) {
 }
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-// Email sender address with the domain gosafrat.com
-const SENDER_EMAIL = 'noreply@gosafrat.com';
+// Email sender address from configuration
+const SENDER_EMAIL = config.emailSender;
 
 // Token generation and validation
 export function generateVerificationToken(): string {
