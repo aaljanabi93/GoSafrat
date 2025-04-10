@@ -119,14 +119,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("No real flight data available, providing enhanced sample data");
         
         // Generate more realistic flight options (10-15 flights)
-        // Use all airlines from our comprehensive airlines object
+        // Use only airlines that exist in our comprehensive airlines object
         const airlineCodes = getAirlineCodes();
+        // Filter to only include airline codes that actually exist in our airlines object
+        const validAirlineCodes = airlineCodes.filter(code => airlines[code] !== undefined);
+        
         const mockFlights: Record<string, any> = {};
         
         const numFlights = Math.floor(Math.random() * 6) + 10; // 10-15 flights
         
+        // Make sure we include popular airlines first
+        const popularAirlines = ["EK", "RJ", "QR", "TK", "EY", "GF", "MS"];
+        
+        // Get available popular airlines (the ones that exist in our data)
+        const availablePopularAirlines = popularAirlines.filter(code => 
+          validAirlineCodes.includes(code)
+        );
+        
         for (let i = 0; i < numFlights; i++) {
-          const airlineCode = airlineCodes[Math.floor(Math.random() * airlineCodes.length)];
+          // Use popular airlines for the first few flights, then random ones
+          let airlineCode;
+          if (i < availablePopularAirlines.length) {
+            airlineCode = availablePopularAirlines[i];
+          } else {
+            airlineCode = validAirlineCodes[Math.floor(Math.random() * validAirlineCodes.length)];
+          }
+          
           const flightNumber = Math.floor(Math.random() * 900) + 100;
           const price = Math.floor(Math.random() * 300) + 400; // Price between 400-700
           
