@@ -36,8 +36,11 @@ export default function Header() {
         {/* Logo */}
         <div className="flex items-center">
           <Link href="/" className="flex items-center">
-            <span className="text-primary text-2xl font-poppins font-bold">Safrat</span>
-            <span className="text-[#28B67A] text-2xl font-poppins font-light">Travel</span>
+            <div className="flex items-center">
+              <img src={logoImage} alt="GoSafrat Logo" className="h-10 mr-2" />
+              <span className="text-primary text-2xl font-poppins font-bold">Go</span>
+              <span className="text-[#e84c5e] text-2xl font-poppins font-medium">Safrat</span>
+            </div>
           </Link>
         </div>
         

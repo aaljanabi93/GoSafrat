@@ -30,6 +30,36 @@ export default function FlightSearch() {
   const [cabinClass, setCabinClass] = useState<string>("economy");
   const [isPassengerOpen, setIsPassengerOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  
+  // Airport search
+  const [originOptions, setOriginOptions] = useState<string[]>([]);
+  const [destinationOptions, setDestinationOptions] = useState<string[]>([]);
+  const [showOriginOptions, setShowOriginOptions] = useState<boolean>(false);
+  const [showDestinationOptions, setShowDestinationOptions] = useState<boolean>(false);
+  
+  // Sample airports
+  const airports = [
+    "New York (JFK)",
+    "London (LHR)",
+    "Paris (CDG)",
+    "Dubai (DXB)",
+    "Tokyo (HND)",
+    "Singapore (SIN)",
+    "Los Angeles (LAX)",
+    "Chicago (ORD)",
+    "Istanbul (IST)",
+    "Hong Kong (HKG)",
+    "Bangkok (BKK)",
+    "Sydney (SYD)",
+    "Delhi (DEL)",
+    "Madrid (MAD)",
+    "Cairo (CAI)",
+    "Berlin (BER)",
+    "Rome (FCO)",
+    "Beijing (PEK)",
+    "Amsterdam (AMS)",
+    "Frankfurt (FRA)"
+  ];
 
   // Dropdown options
   const cabinOptions = [
@@ -37,6 +67,45 @@ export default function FlightSearch() {
     { value: "business", label: t("Business", "رجال الأعمال") },
     { value: "first", label: t("First Class", "الدرجة الأولى") }
   ];
+
+  // Handle airport search
+  const handleSearchOrigin = (value: string) => {
+    setOrigin(value);
+    if (value.length > 1) {
+      const filtered = airports.filter(airport => 
+        airport.toLowerCase().includes(value.toLowerCase())
+      );
+      setOriginOptions(filtered);
+      setShowOriginOptions(filtered.length > 0);
+    } else {
+      setOriginOptions([]);
+      setShowOriginOptions(false);
+    }
+  };
+
+  const handleSearchDestination = (value: string) => {
+    setDestination(value);
+    if (value.length > 1) {
+      const filtered = airports.filter(airport => 
+        airport.toLowerCase().includes(value.toLowerCase())
+      );
+      setDestinationOptions(filtered);
+      setShowDestinationOptions(filtered.length > 0);
+    } else {
+      setDestinationOptions([]);
+      setShowDestinationOptions(false);
+    }
+  };
+
+  const selectOrigin = (airport: string) => {
+    setOrigin(airport);
+    setShowOriginOptions(false);
+  };
+
+  const selectDestination = (airport: string) => {
+    setDestination(airport);
+    setShowDestinationOptions(false);
+  };
 
   // Handle search submission
   const handleSearchFlights = async () => {
@@ -133,14 +202,40 @@ export default function FlightSearch() {
             </div>
             <Input
               type="text"
-              className="pl-10 pr-16"
+              className="pl-10 pr-16 text-gray-800"
               placeholder={t("From: City or Airport", "من: المدينة أو المطار")}
               value={origin}
-              onChange={(e) => setOrigin(e.target.value)}
+              onChange={(e) => handleSearchOrigin(e.target.value)}
+              onFocus={() => origin.length > 1 && setShowOriginOptions(true)}
+              onBlur={() => setTimeout(() => setShowOriginOptions(false), 200)}
             />
             {origin && (
-              <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400">
-                <span className="text-xs">{origin.toUpperCase().substring(0, 3)}</span>
+              <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-700">
+                <span className="text-xs font-medium">
+                  {origin.match(/\([A-Z]{3}\)$/) 
+                    ? origin.match(/\(([A-Z]{3})\)$/)?.[1] 
+                    : origin.substring(0, 3).toUpperCase()}
+                </span>
+              </div>
+            )}
+            
+            {/* Origin Airport Search Results */}
+            {showOriginOptions && originOptions.length > 0 && (
+              <div className="absolute z-10 w-full bg-white mt-1 rounded-md border border-gray-200 shadow-lg max-h-60 overflow-y-auto">
+                {originOptions.map((airport, index) => (
+                  <div 
+                    key={index}
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
+                    onClick={() => selectOrigin(airport)}
+                  >
+                    <div className={language === 'ar' ? 'font-cairo' : ''}>
+                      {airport}
+                    </div>
+                    <div className="text-gray-500 text-xs font-medium">
+                      {airport.match(/\(([A-Z]{3})\)$/)?.[1]}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -152,14 +247,40 @@ export default function FlightSearch() {
             </div>
             <Input
               type="text"
-              className="pl-10 pr-16"
+              className="pl-10 pr-16 text-gray-800"
               placeholder={t("To: City or Airport", "إلى: المدينة أو المطار")}
               value={destination}
-              onChange={(e) => setDestination(e.target.value)}
+              onChange={(e) => handleSearchDestination(e.target.value)}
+              onFocus={() => destination.length > 1 && setShowDestinationOptions(true)}
+              onBlur={() => setTimeout(() => setShowDestinationOptions(false), 200)}
             />
             {destination && (
-              <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400">
-                <span className="text-xs">{destination.toUpperCase().substring(0, 3)}</span>
+              <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-700">
+                <span className="text-xs font-medium">
+                  {destination.match(/\([A-Z]{3}\)$/) 
+                    ? destination.match(/\(([A-Z]{3})\)$/)?.[1] 
+                    : destination.substring(0, 3).toUpperCase()}
+                </span>
+              </div>
+            )}
+            
+            {/* Destination Airport Search Results */}
+            {showDestinationOptions && destinationOptions.length > 0 && (
+              <div className="absolute z-10 w-full bg-white mt-1 rounded-md border border-gray-200 shadow-lg max-h-60 overflow-y-auto">
+                {destinationOptions.map((airport, index) => (
+                  <div 
+                    key={index}
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
+                    onClick={() => selectDestination(airport)}
+                  >
+                    <div className={language === 'ar' ? 'font-cairo' : ''}>
+                      {airport}
+                    </div>
+                    <div className="text-gray-500 text-xs font-medium">
+                      {airport.match(/\(([A-Z]{3})\)$/)?.[1]}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -191,7 +312,9 @@ export default function FlightSearch() {
                   selected={departureDate}
                   onSelect={setDepartureDate}
                   initialFocus
-                  disabled={(date) => date < new Date()}
+                  disabled={(date) => {
+                    return date < new Date();
+                  }}
                 />
               </PopoverContent>
             </Popover>
