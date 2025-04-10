@@ -42,15 +42,15 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2">
               {[
-                { key: "About Us", arKey: "معلومات عنا", href: "#" },
-                { key: "Careers", arKey: "وظائف", href: "#" },
-                { key: "Partners", arKey: "شركاء", href: "#" },
-                { key: "Press", arKey: "صحافة", href: "#" }
+                { key: "About Us", arKey: "معلومات عنا", href: "/company/about" },
+                { key: "Careers", arKey: "وظائف", href: "/company/careers" },
+                { key: "Partners", arKey: "شركاء", href: "/company/partners" },
+                { key: "Press", arKey: "صحافة", href: "/company/press" }
               ].map((item, index) => (
                 <li key={index}>
-                  <a href={item.href} className={`text-gray-400 hover:text-white transition ${language === 'ar' ? 'font-cairo' : ''}`}>
+                  <Link href={item.href} className={`text-gray-400 hover:text-white transition ${language === 'ar' ? 'font-cairo' : ''}`}>
                     {t(item.key, item.arKey)}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -63,15 +63,15 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2">
               {[
-                { key: "Help Center", arKey: "مركز المساعدة", href: "#" },
-                { key: "Contact Us", arKey: "اتصل بنا", href: "#" },
-                { key: "Cancellation Options", arKey: "خيارات الإلغاء", href: "#" },
-                { key: "Safety Resources", arKey: "موارد السلامة", href: "#" }
+                { key: "Help Center", arKey: "مركز المساعدة", href: "/support/help-center" },
+                { key: "Contact Us", arKey: "اتصل بنا", href: "/support/contact" },
+                { key: "Cancellation Options", arKey: "خيارات الإلغاء", href: "/support/cancellation" },
+                { key: "Safety Resources", arKey: "موارد السلامة", href: "/support/safety" }
               ].map((item, index) => (
                 <li key={index}>
-                  <a href={item.href} className={`text-gray-400 hover:text-white transition ${language === 'ar' ? 'font-cairo' : ''}`}>
+                  <Link href={item.href} className={`text-gray-400 hover:text-white transition ${language === 'ar' ? 'font-cairo' : ''}`}>
                     {t(item.key, item.arKey)}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -84,14 +84,14 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2">
               {[
-                { key: "Terms & Conditions", arKey: "الشروط والأحكام", href: "#" },
-                { key: "Privacy Policy", arKey: "سياسة الخصوصية", href: "#" },
-                { key: "Cookie Policy", arKey: "سياسة ملفات تعريف الارتباط", href: "#" }
+                { key: "Terms & Conditions", arKey: "الشروط والأحكام", href: "/legal/terms" },
+                { key: "Privacy Policy", arKey: "سياسة الخصوصية", href: "/legal/privacy" },
+                { key: "Cookie Policy", arKey: "سياسة ملفات تعريف الارتباط", href: "/legal/cookies" }
               ].map((item, index) => (
                 <li key={index}>
-                  <a href={item.href} className={`text-gray-400 hover:text-white transition ${language === 'ar' ? 'font-cairo' : ''}`}>
+                  <Link href={item.href} className={`text-gray-400 hover:text-white transition ${language === 'ar' ? 'font-cairo' : ''}`}>
                     {t(item.key, item.arKey)}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
