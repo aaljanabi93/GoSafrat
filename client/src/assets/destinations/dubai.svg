@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="400" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="400" fill="#f0f2f5"/>
+  <path d="M250 100L270 300H230L250 100Z" fill="#64b5f6"/>
+  <path d="M350 150L370 300H330L350 150Z" fill="#64b5f6"/>
+  <path d="M300 180L320 300H280L300 180Z" fill="#64b5f6"/>
+  <path d="M200 350H400V380H200V350Z" fill="#90caf9"/>
+  <text x="300" y="335" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="24" fill="#333">Dubai</text>
+  <text x="300" y="60" text-anchor="middle" font-family="Arial" font-size="18" fill="#555">Burj Khalifa</text>
+</svg>

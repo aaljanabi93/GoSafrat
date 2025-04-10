@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="400" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="400" fill="#f0f2f5"/>
+  <path d="M200 200A100 100 0 0 1 400 200V300H200V200Z" fill="#81c784"/>
+  <circle cx="250" cy="200" r="20" fill="#4caf50"/>
+  <circle cx="350" cy="200" r="20" fill="#4caf50"/>
+  <rect x="200" y="300" width="200" height="40" fill="#66bb6a"/>
+  <path d="M300 150V200" stroke="#388e3c" stroke-width="5"/>
+  <circle cx="300" cy="140" r="15" fill="#388e3c"/>
+  <text x="300" y="380" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="24" fill="#333">Istanbul</text>
+  <text x="300" y="80" text-anchor="middle" font-family="Arial" font-size="18" fill="#555">Blue Mosque</text>
+</svg>

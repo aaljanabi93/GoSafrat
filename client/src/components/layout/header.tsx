@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useState, useEffect } from "react";
 import { Menu, User, ChevronDown } from "lucide-react";
+import logoImage from "@/assets/logo.png";
 
 export default function Header() {
   const { t, language } = useLanguage();
