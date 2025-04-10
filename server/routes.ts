@@ -519,21 +519,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { query } = req.query;
       
-      if (!query || typeof query !== 'string' || false) {
-        return res.status(400).json({ message: "Query must be at least 2 characters" });
+      if (!query || typeof query !== 'string') {
+        return res.status(400).json({ message: "Query parameter is required" });
       }
 
-      // Call Travelpayouts API for airport search
-      const response = await axios.get(`${TRAVELPAYOUTS_API_BASE}/data/en/airports.json`, {
-        headers: {
-          'X-Access-Token': process.env.TRAVELPAYOUTS_API_TOKEN
-        }
-      });
-
+      // Use our local airport data (from the airports-data.ts file) for faster and more reliable searches
+      // Import the airport data from the client
+      const { airports } = await import("../client/src/lib/airports-data");
+      
       // Filter airports by query
       const lowercaseQuery = query.toLowerCase();
-      let filteredAirports = response.data
-        .filter((airport: any) => 
+      let filteredAirports = airports
+        .filter((airport) => 
           airport.name.toLowerCase().includes(lowercaseQuery) || 
           airport.city.toLowerCase().includes(lowercaseQuery) ||
           airport.code.toLowerCase().includes(lowercaseQuery)
@@ -578,23 +575,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { query } = req.query;
       
-      if (!query || typeof query !== 'string' || query.length < 2) {
-        return res.status(400).json({ message: "Query must be at least 2 characters" });
+      if (!query || typeof query !== 'string') {
+        return res.status(400).json({ message: "Query parameter is required" });
       }
 
-      // Call Travelpayouts API for city search
-      const response = await axios.get(`${TRAVELPAYOUTS_API_BASE}/data/en/cities.json`, {
-        headers: {
-          'X-Access-Token': process.env.TRAVELPAYOUTS_API_TOKEN
-        }
-      });
-
+      // Use our local cities data for faster and more reliable searches
+      // Import the cities data
+      const { cities } = await import("../client/src/lib/cities-data");
+      
       // Filter cities by query
       const lowercaseQuery = query.toLowerCase();
-      let filteredCities = response.data
-        .filter((city: any) => 
+      let filteredCities = cities
+        .filter((city) => 
           city.name.toLowerCase().includes(lowercaseQuery) ||
-          city.code.toLowerCase().includes(lowercaseQuery)
+          city.code.toLowerCase().includes(lowercaseQuery) ||
+          city.country.toLowerCase().includes(lowercaseQuery)
         );
         
       // Sort results with priority:
