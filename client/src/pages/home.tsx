@@ -7,6 +7,7 @@ import DealsSection from "@/components/home/deals-section";
 import DestinationsSection from "@/components/home/destinations-section";
 import BookingSteps from "@/components/home/booking-steps";
 import ServicesSection from "@/components/home/services-section";
+import FeaturesSection from "@/components/home/features-section";
 import TestimonialsSection from "@/components/home/testimonials-section";
 import DownloadAppSection from "@/components/home/download-app-section";
 import { Helmet } from "react-helmet";
@@ -37,6 +38,7 @@ export default function Home() {
           <DealsSection />
           <DestinationsSection />
           <BookingSteps />
+          <FeaturesSection />
           <ServicesSection />
           <TestimonialsSection />
           <DownloadAppSection />
