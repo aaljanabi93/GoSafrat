@@ -3,7 +3,7 @@ import { useLanguage } from "@/context/language-context";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, Plane, Building, Car, BadgeCheck, RocketLaunch, Globe, UsersRound } from "lucide-react";
+import { Check, Plane, Building, Car, BadgeCheck, Rocket, Globe, Users } from "lucide-react";
 import { getAllAirlines } from "@/lib/airlines-data";
 
 export default function PartnersPage() {
@@ -39,14 +39,14 @@ export default function PartnersPage() {
       descriptionAr: "الوصول إلى ملايين المسافرين من الشرق الأوسط وجميع أنحاء العالم."
     },
     {
-      icon: <UsersRound className="h-8 w-8 text-blue-600" />,
+      icon: <Users className="h-8 w-8 text-blue-600" />,
       title: "Targeted Audience",
       titleAr: "جمهور مستهدف",
       description: "Connect with travelers specifically interested in your region and services.",
       descriptionAr: "تواصل مع المسافرين المهتمين تحديدًا بمنطقتك وخدماتك."
     },
     {
-      icon: <RocketLaunch className="h-8 w-8 text-blue-600" />,
+      icon: <Rocket className="h-8 w-8 text-blue-600" />,
       title: "Growth Opportunities",
       titleAr: "فرص النمو",
       description: "Expand your market presence through our established platform.",

@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import Navbar from "./navbar";
+import Header from "./header";
 import Footer from "./footer";
 import { useLanguage } from "@/context/language-context";
 
@@ -29,7 +29,7 @@ export default function PageLayout({
   
   return (
     <>
-      <Navbar />
+      <Header />
       
       {withHero && (
         <div 

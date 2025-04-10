@@ -22,6 +22,19 @@ import { CurrencyProvider } from "@/context/currency-context";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/components/auth/protected-route";
 
+// Import all our new pages
+import AboutPage from "@/pages/company/about";
+import CareersPage from "@/pages/company/careers";
+import PartnersPage from "@/pages/company/partners";
+import PressPage from "@/pages/company/press";
+import HelpCenterPage from "@/pages/support/help-center";
+import ContactPage from "@/pages/support/contact";
+import CancellationPage from "@/pages/support/cancellation";
+import SafetyResourcesPage from "@/pages/support/safety";
+import TermsAndConditionsPage from "@/pages/legal/terms";
+import PrivacyPolicyPage from "@/pages/legal/privacy";
+import CookiePolicyPage from "@/pages/legal/cookies";
+
 function Router() {
   return (
     <Switch>
@@ -44,6 +57,24 @@ function Router() {
       <ProtectedRoute path="/profile">
         <ProfilePage />
       </ProtectedRoute>
+      
+      {/* Company Pages */}
+      <Route path="/company/about" component={AboutPage} />
+      <Route path="/company/careers" component={CareersPage} />
+      <Route path="/company/partners" component={PartnersPage} />
+      <Route path="/company/press" component={PressPage} />
+      
+      {/* Support Pages */}
+      <Route path="/support/help-center" component={HelpCenterPage} />
+      <Route path="/support/contact" component={ContactPage} />
+      <Route path="/support/cancellation" component={CancellationPage} />
+      <Route path="/support/safety" component={SafetyResourcesPage} />
+      
+      {/* Legal Pages */}
+      <Route path="/legal/terms" component={TermsAndConditionsPage} />
+      <Route path="/legal/privacy" component={PrivacyPolicyPage} />
+      <Route path="/legal/cookies" component={CookiePolicyPage} />
+      
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
