@@ -6,6 +6,12 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
+import { 
+  generateVerificationToken, 
+  generateResetToken, 
+  sendVerificationEmail,
+  sendPasswordResetEmail 
+} from "./services/email-service";
 
 declare global {
   namespace Express {
@@ -82,19 +88,50 @@ export function setupAuth(app: Express) {
       if (existingUser) {
         return res.status(400).json({ message: "Username already exists" });
       }
+      
+      // Check if email already exists
+      const existingEmail = await storage.getUserByEmail(req.body.email);
+      if (existingEmail) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
 
       // Create the user with hashed password
       const user = await storage.createUser({
         ...req.body,
         password: await hashPassword(req.body.password),
       });
+      
+      // Generate verification token
+      const token = generateVerificationToken();
+      
+      // Set verification token with 24 hour expiration
+      const verificationExpiresIn = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+      await storage.setVerificationToken(user.id, token, verificationExpiresIn);
+      
+      // Get base URL for link construction
+      const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+      const baseUrl = `${protocol}://${req.get('host')}`;
+      
+      // Send verification email asynchronously
+      sendVerificationEmail(user, token, baseUrl)
+        .then(sent => {
+          if (!sent) {
+            console.error('Failed to send verification email to:', user.email);
+          }
+        })
+        .catch(err => {
+          console.error('Error sending verification email:', err);
+        });
 
       // Log the user in
       req.login(user, (err: Error | null) => {
         if (err) return next(err);
         // Send back user object without the password
         const { password, ...userWithoutPassword } = user;
-        res.status(201).json(userWithoutPassword);
+        res.status(201).json({
+          ...userWithoutPassword,
+          message: "Registration successful. Please check your email to verify your account."
+        });
       });
     } catch (error: unknown) {
       console.error("Registration error:", error);

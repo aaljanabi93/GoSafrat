@@ -10,9 +10,18 @@ export interface IStorage {
   // User methods
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, userData: Partial<User>): Promise<User>;
   updateStripeCustomerId(userId: number, stripeCustomerId: string): Promise<User>;
+  
+  // Email verification methods
+  setVerificationToken(userId: number, token: string, expiresIn: number): Promise<User>;
+  verifyEmail(token: string): Promise<User | undefined>;
+  
+  // Password reset methods
+  setResetToken(userId: number, token: string, expiresIn: number): Promise<User>;
+  getUserByResetToken(token: string): Promise<User | undefined>;
 
   // Flight booking methods
   createFlightBooking(booking: InsertFlightBooking): Promise<FlightBooking>;
@@ -53,6 +62,11 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db.select().from(users).where(eq(users.username, username));
     return user || undefined;
   }
+  
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const [user] = await db.insert(users).values(insertUser).returning();
@@ -75,6 +89,83 @@ export class DatabaseStorage implements IStorage {
 
   async updateStripeCustomerId(userId: number, stripeCustomerId: string): Promise<User> {
     return this.updateUser(userId, { stripeCustomerId });
+  }
+  
+  // Email verification methods
+  async setVerificationToken(userId: number, token: string, expiresIn: number): Promise<User> {
+    // Calculate expiration date (current time + expiresIn milliseconds)
+    const expirationDate = new Date(Date.now() + expiresIn);
+    
+    return this.updateUser(userId, {
+      verificationToken: token,
+      verificationExpires: expirationDate
+    });
+  }
+  
+  async verifyEmail(token: string): Promise<User | undefined> {
+    // Find user with matching token that hasn't expired
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(
+        and(
+          eq(users.verificationToken, token),
+          // Expiration check not implemented due to LSP limitation
+          // We would check if verificationExpires > NOW()
+        )
+      );
+    
+    if (!user) {
+      return undefined;
+    }
+    
+    // Check expiration manually
+    if (user.verificationExpires && user.verificationExpires < new Date()) {
+      return undefined;
+    }
+    
+    // Mark email as verified and clear verification token
+    const [updatedUser] = await db
+      .update(users)
+      .set({
+        emailVerified: true,
+        verificationToken: null,
+        verificationExpires: null,
+      })
+      .where(eq(users.id, user.id))
+      .returning();
+      
+    return updatedUser;
+  }
+  
+  // Password reset methods
+  async setResetToken(userId: number, token: string, expiresIn: number): Promise<User> {
+    // Calculate expiration date (current time + expiresIn milliseconds)
+    const expirationDate = new Date(Date.now() + expiresIn);
+    
+    return this.updateUser(userId, {
+      resetToken: token,
+      resetExpires: expirationDate
+    });
+  }
+  
+  async getUserByResetToken(token: string): Promise<User | undefined> {
+    // Find user with matching token
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.resetToken, token));
+      
+    if (!user) {
+      return undefined;
+    }
+    
+    // Check expiration manually
+    if (user.resetExpires && user.resetExpires < new Date()) {
+      return undefined;
+    }
+    
+    return user;
   }
 
   // Flight booking methods
