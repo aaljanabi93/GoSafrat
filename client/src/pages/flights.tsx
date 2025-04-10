@@ -276,7 +276,10 @@ export default function Flights() {
             <div className="space-y-4">
               {isLoading ? (
                 <div className="flex justify-center items-center py-12">
-                  <div className="animate-spin w-12 h-12 border-4 border-primary border-t-transparent rounded-full"></div>
+                  <LoadingSpinnerWithText 
+                    text={t("Searching for the best flight deals...", "جارٍ البحث عن أفضل عروض الرحلات...")}
+                    spinnerProps={{ variant: "plane", size: "lg" }}
+                  />
                 </div>
               ) : error ? (
                 <div className="text-center py-8">
