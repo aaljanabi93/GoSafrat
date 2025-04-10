@@ -1,18 +1,18 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
 
 // Define booking types
-interface BaggageInfo {
+export interface BaggageInfo {
   cabin: string;
   checked: string;
 }
 
-interface FlightStop {
+export interface FlightStop {
   airport: string;
   city: string;
   duration: string;
 }
 
-interface FlightBookingData {
+export interface FlightBookingData {
   type: "flight";
   departureCity: string;
   departureAirport: string;

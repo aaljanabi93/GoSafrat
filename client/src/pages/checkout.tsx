@@ -332,38 +332,85 @@ export default function Checkout() {
     if (!currentBooking) return null;
     
     if (currentBooking.type === "flight") {
+      // Base details that are always needed
+      const details = [
+        {
+          label: t("Flight", "الرحلة"),
+          value: currentBooking.airline || t("Selected Flight", "الرحلة المحددة")
+        },
+        {
+          label: t("Flight Number", "رقم الرحلة"),
+          value: currentBooking.flightNumber || "-"
+        },
+        {
+          label: t("From", "من"),
+          value: `${currentBooking.departureCity} (${currentBooking.departureAirport})`
+        },
+        {
+          label: t("To", "إلى"),
+          value: `${currentBooking.arrivalCity} (${currentBooking.arrivalAirport})`
+        },
+        {
+          label: t("Departure", "المغادرة"),
+          value: format(new Date(currentBooking.departureTime), "PPP")
+        },
+        {
+          label: t("Duration", "المدة"),
+          value: currentBooking.duration || "-"
+        },
+        {
+          label: t("Passengers", "المسافرين"),
+          value: currentBooking.passengers
+        },
+        {
+          label: t("Class", "الدرجة"),
+          value: currentBooking.cabinClass === "economy" 
+            ? t("Economy", "اقتصادي") 
+            : currentBooking.cabinClass === "business" 
+              ? t("Business", "رجال الأعمال")
+              : t("First Class", "الدرجة الأولى")
+        }
+      ];
+
+      // Add baggage information if available
+      if (currentBooking.baggage) {
+        details.push({
+          label: t("Baggage Allowance", "السماح بالأمتعة"),
+          value: `${t("Cabin", "مقصورة")}: ${currentBooking.baggage.cabin}, ${t("Checked", "مسجلة")}: ${currentBooking.baggage.checked}`
+        });
+      }
+
+      // Add stops information if available
+      if (currentBooking.stops && currentBooking.stops.length > 0) {
+        details.push({
+          label: t("Stops", "التوقفات"),
+          value: currentBooking.stops.map(stop => `${stop.airport} (${stop.city}) - ${stop.duration}`).join(", ")
+        });
+      } else {
+        details.push({
+          label: t("Flight Type", "نوع الرحلة"),
+          value: t("Direct", "مباشر")
+        });
+      }
+
+      // Add visa requirement if available
+      if (currentBooking.visaRequired) {
+        details.push({
+          label: t("Visa Requirement", "متطلبات التأشيرة"),
+          value: t("Visa required for the destination", "تأشيرة مطلوبة للوجهة")
+        });
+      }
+      
       return {
         title: t("Flight Booking", "حجز رحلة طيران"),
-        details: [
-          {
-            label: t("Flight", "الرحلة"),
-            value: currentBooking.airline || t("Selected Flight", "الرحلة المحددة")
-          },
-          {
-            label: t("From", "من"),
-            value: `${currentBooking.departureCity} (${currentBooking.departureAirport})`
-          },
-          {
-            label: t("To", "إلى"),
-            value: `${currentBooking.arrivalCity} (${currentBooking.arrivalAirport})`
-          },
-          {
-            label: t("Departure", "المغادرة"),
-            value: format(new Date(currentBooking.departureTime), "PPP")
-          },
-          {
-            label: t("Passengers", "المسافرين"),
-            value: currentBooking.passengers
-          },
-          {
-            label: t("Class", "الدرجة"),
-            value: currentBooking.cabinClass === "economy" 
-              ? t("Economy", "اقتصادي") 
-              : currentBooking.cabinClass === "business" 
-                ? t("Business", "رجال الأعمال")
-                : t("First Class", "الدرجة الأولى")
-          }
-        ]
+        details: details,
+        airlineLogo: currentBooking.airline === "Emirates" 
+          ? "https://upload.wikimedia.org/wikipedia/commons/d/d0/Emirates_logo.svg"
+          : currentBooking.airline === "British Airways"
+          ? "https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/British_Airways_Logo.svg/250px-British_Airways_Logo.svg.png"
+          : currentBooking.airline === "Qatar Airways"
+          ? "https://upload.wikimedia.org/wikipedia/en/thumb/f/f4/Qatar_Airways_Logo.svg/1200px-Qatar_Airways_Logo.svg.png"
+          : null
       };
     } else if (currentBooking.type === "hotel") {
       return {
@@ -436,7 +483,7 @@ export default function Checkout() {
   const stripeOptions = {
     clientSecret,
     appearance: {
-      theme: 'stripe',
+      theme: 'stripe' as const,
     },
   };
   
@@ -493,9 +540,18 @@ export default function Checkout() {
                     
                     {bookingDetails && (
                       <>
-                        <p className={`font-medium text-gray-700 mb-2 ${language === 'ar' ? 'font-cairo' : ''}`}>
-                          {bookingDetails.title}
-                        </p>
+                        <div className="flex justify-between items-center mb-4">
+                          <p className={`font-medium text-gray-700 ${language === 'ar' ? 'font-cairo' : ''}`}>
+                            {bookingDetails.title}
+                          </p>
+                          {bookingDetails.airlineLogo && (
+                            <img 
+                              src={bookingDetails.airlineLogo} 
+                              alt="Airline Logo" 
+                              className="h-8 w-auto object-contain"
+                            />
+                          )}
+                        </div>
                         
                         <div className="space-y-2 mb-4">
                           {bookingDetails.details.map((detail, index) => (
@@ -503,7 +559,7 @@ export default function Checkout() {
                               <span className={`text-sm text-gray-600 ${language === 'ar' ? 'font-cairo' : ''}`}>
                                 {detail.label}:
                               </span>
-                              <span className={`text-sm font-medium ${language === 'ar' ? 'font-cairo' : ''}`}>
+                              <span className={`text-sm font-medium text-right ml-2 ${language === 'ar' ? 'font-cairo mr-2 ml-0' : ''}`}>
                                 {detail.value}
                               </span>
                             </div>

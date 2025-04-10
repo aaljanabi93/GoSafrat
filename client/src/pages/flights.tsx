@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/context/language-context";
 import { useBooking } from "@/context/booking-context";
+import { FlightBookingData } from "@/context/booking-context";
 import { useLocation } from "wouter";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
@@ -248,68 +249,129 @@ export default function Flights() {
                   className="border border-gray-200 hover:shadow-md transition"
                 >
                   <CardContent className="p-4">
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
-                      {/* Airline Info */}
-                      <div className="flex items-center mb-4 md:mb-0">
-                        <img 
-                          src={flight.airline.logo} 
-                          alt={language === 'en' ? flight.airline.name : flight.airline.nameAr} 
-                          className="w-10 h-10 rounded object-contain mr-3"
-                        />
-                        <div>
-                          <div className={`font-medium ${language === 'ar' ? 'font-cairo' : ''}`}>
-                            {language === 'en' ? flight.airline.name : flight.airline.nameAr}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {flight.airline.flightNumber} • {flight.airline.aircraft}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Flight Details */}
-                      <div className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-8 rtl:space-x-reverse">
-                        {/* Departure */}
-                        <div className="text-center">
-                          <div className="text-lg font-semibold">{flight.departure.time}</div>
-                          <div className={`text-xs text-gray-500 ${language === 'ar' ? 'font-cairo' : ''}`}>
-                            {flight.departure.airport} • {language === 'en' ? flight.departure.date : flight.departure.date}
+                    <div className="flex flex-col items-start justify-between">
+                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between w-full mb-4">
+                        {/* Airline Info */}
+                        <div className="flex items-center mb-4 md:mb-0">
+                          <img 
+                            src={flight.airline.logo} 
+                            alt={language === 'en' ? flight.airline.name : flight.airline.nameAr} 
+                            className="w-10 h-10 rounded object-contain mr-3"
+                          />
+                          <div>
+                            <div className={`font-medium ${language === 'ar' ? 'font-cairo' : ''}`}>
+                              {language === 'en' ? flight.airline.name : flight.airline.nameAr}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {flight.airline.flightNumber} • {flight.airline.aircraft}
+                            </div>
                           </div>
                         </div>
                         
-                        {/* Duration */}
-                        <div className="text-center flex flex-col items-center">
-                          <div className="text-xs text-gray-500">{flight.duration}</div>
-                          <div className="relative w-20 h-px bg-gray-300 my-1">
-                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary"></div>
+                        {/* Flight Details */}
+                        <div className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-8 rtl:space-x-reverse">
+                          {/* Departure */}
+                          <div className="text-center">
+                            <div className="text-lg font-semibold">{flight.departure.time}</div>
+                            <div className={`text-xs text-gray-500 ${language === 'ar' ? 'font-cairo' : ''}`}>
+                              {flight.departure.airport} • {language === 'en' ? flight.departure.date : flight.departure.date}
+                            </div>
+                            <div className="text-xs text-gray-600">
+                              {flight.departure.city || "Dubai"}
+                            </div>
                           </div>
-                          <div className={`text-xs text-gray-500 ${language === 'ar' ? 'font-cairo' : ''}`}>
-                            {flight.direct ? t("Direct", "مباشر") : t("1 Stop", "توقف واحد")}
+                          
+                          {/* Duration */}
+                          <div className="text-center flex flex-col items-center">
+                            <div className="text-xs text-gray-500">{flight.duration}</div>
+                            <div className="relative w-20 h-px bg-gray-300 my-1">
+                              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary"></div>
+                            </div>
+                            <div className={`text-xs text-gray-500 ${language === 'ar' ? 'font-cairo' : ''}`}>
+                              {flight.direct ? t("Direct", "مباشر") : t("1 Stop", "توقف واحد")}
+                            </div>
+                          </div>
+                          
+                          {/* Arrival */}
+                          <div className="text-center">
+                            <div className="text-lg font-semibold">{flight.arrival.time}</div>
+                            <div className={`text-xs text-gray-500 ${language === 'ar' ? 'font-cairo' : ''}`}>
+                              {flight.arrival.airport} • {language === 'en' ? flight.arrival.date : flight.arrival.date}
+                            </div>
+                            <div className="text-xs text-gray-600">
+                              {flight.arrival.city || "Amman"}
+                            </div>
                           </div>
                         </div>
                         
-                        {/* Arrival */}
-                        <div className="text-center">
-                          <div className="text-lg font-semibold">{flight.arrival.time}</div>
+                        {/* Price & Book */}
+                        <div className="w-full md:w-auto mt-4 md:mt-0 flex flex-col items-end">
+                          <div className="text-lg font-semibold text-primary">${flight.price}</div>
                           <div className={`text-xs text-gray-500 ${language === 'ar' ? 'font-cairo' : ''}`}>
-                            {flight.arrival.airport} • {language === 'en' ? flight.arrival.date : flight.arrival.date}
+                            {t("per person", "للشخص الواحد")}
                           </div>
+                          <Button 
+                            className="mt-2 bg-[#FF6B6B] hover:bg-opacity-90 text-white w-full md:w-auto"
+                            onClick={() => handleSelectFlight(flight)}
+                          >
+                            <span className={language === 'ar' ? 'font-cairo' : ''}>
+                              {t("Select", "اختيار")}
+                            </span>
+                          </Button>
                         </div>
                       </div>
                       
-                      {/* Price & Book */}
-                      <div className="w-full md:w-auto mt-4 md:mt-0 flex flex-col items-end">
-                        <div className="text-lg font-semibold text-primary">${flight.price}</div>
-                        <div className={`text-xs text-gray-500 ${language === 'ar' ? 'font-cairo' : ''}`}>
-                          {t("per person", "للشخص الواحد")}
+                      {/* Additional Flight Details */}
+                      <div className="w-full border-t border-gray-200 pt-3 mt-2">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          {/* Baggage Info */}
+                          <div>
+                            <div className={`text-sm font-medium mb-1 ${language === 'ar' ? 'font-cairo' : ''}`}>
+                              {t("Baggage Allowance", "السماح بالأمتعة")}
+                            </div>
+                            <div className="flex space-x-4 rtl:space-x-reverse text-xs text-gray-600">
+                              <div>
+                                <span className="font-medium">{t("Cabin", "مقصورة")}: </span>
+                                {flight.baggage?.cabin || "7kg"}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("Checked", "مسجلة")}: </span>
+                                {flight.baggage?.checked || "20kg"}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Stops Info (if any) */}
+                          {!flight.direct && flight.stops && flight.stops.length > 0 && (
+                            <div>
+                              <div className={`text-sm font-medium mb-1 ${language === 'ar' ? 'font-cairo' : ''}`}>
+                                {t("Stops", "التوقفات")}
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                {flight.stops.map((stop: any, index: number) => (
+                                  <div key={index}>
+                                    {stop.airport} ({stop.city}) - {stop.duration}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Visa Requirements */}
+                          {flight.visaRequired && (
+                            <div>
+                              <div className={`text-sm font-medium mb-1 ${language === 'ar' ? 'font-cairo' : ''}`}>
+                                {t("Visa Requirements", "متطلبات التأشيرة")}
+                              </div>
+                              <div className="text-xs text-amber-600 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                {t("Visa required for", "تأشيرة مطلوبة لـ")} {flight.arrival.city || "Amman"}
+                              </div>
+                            </div>
+                          )}
                         </div>
-                        <Button 
-                          className="mt-2 bg-[#FF6B6B] hover:bg-opacity-90 text-white w-full md:w-auto"
-                          onClick={() => handleSelectFlight(flight)}
-                        >
-                          <span className={language === 'ar' ? 'font-cairo' : ''}>
-                            {t("Select", "اختيار")}
-                          </span>
-                        </Button>
                       </div>
                     </div>
                   </CardContent>
