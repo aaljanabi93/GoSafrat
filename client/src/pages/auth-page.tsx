@@ -206,7 +206,7 @@ export default function AuthPage() {
                           className="p-0 text-sm" 
                           onClick={() => {
                             const email = loginForm.getValues().username;
-                            setLocation(`/reset-password${email ? `?email=${encodeURIComponent(email)}` : ''}`);
+                            window.location.href = `/forgot-password${email ? `?email=${encodeURIComponent(email)}` : ''}`;
                           }}
                         >
                           {t("Forgot Password?", "نسيت كلمة المرور؟")}
