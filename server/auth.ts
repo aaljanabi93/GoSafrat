@@ -109,8 +109,11 @@ export function setupAuth(app: Express) {
       await storage.setVerificationToken(user.id, token, verificationExpiresIn);
       
       // Get base URL for link construction
+      // Use gosafrat.com in production, otherwise use the request host
       const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-      const baseUrl = `${protocol}://${req.get('host')}`;
+      const baseUrl = process.env.NODE_ENV === 'production' 
+        ? 'https://gosafrat.com'
+        : `${protocol}://${req.get('host')}`;
       
       // Send verification email asynchronously
       sendVerificationEmail(user, token, baseUrl)
@@ -296,8 +299,11 @@ export function setupAuth(app: Express) {
       await storage.setVerificationToken(req.user.id, token, verificationExpiresIn);
       
       // Get base URL for link construction
+      // Use gosafrat.com in production, otherwise use the request host
       const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-      const baseUrl = `${protocol}://${req.get('host')}`;
+      const baseUrl = process.env.NODE_ENV === 'production' 
+        ? 'https://gosafrat.com'
+        : `${protocol}://${req.get('host')}`;
       
       // Send verification email
       const sent = await sendVerificationEmail(req.user, token, baseUrl);
@@ -342,8 +348,11 @@ export function setupAuth(app: Express) {
       await storage.setResetToken(user.id, token, resetExpiresIn);
       
       // Get base URL for link construction
+      // Use gosafrat.com in production, otherwise use the request host
       const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-      const baseUrl = `${protocol}://${req.get('host')}`;
+      const baseUrl = process.env.NODE_ENV === 'production' 
+        ? 'https://gosafrat.com'
+        : `${protocol}://${req.get('host')}`;
       
       // Send password reset email
       sendPasswordResetEmail(user, token, baseUrl)

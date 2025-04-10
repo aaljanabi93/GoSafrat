@@ -265,7 +265,7 @@ export default function AuthPage() {
                                 {t("First Name", "الاسم الأول")}
                               </FormLabel>
                               <FormControl>
-                                <Input placeholder={t("Enter your first name", "أدخل اسمك الأول")} {...field} />
+                                <Input placeholder={t("Enter your first name", "أدخل اسمك الأول")} {...field} value={field.value || ""} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>

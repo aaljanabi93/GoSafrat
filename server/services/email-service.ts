@@ -8,7 +8,7 @@ if (!process.env.SENDGRID_API_KEY) {
 }
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-// Email sender address - replace with your verified sender
+// Email sender address with the domain gosafrat.com
 const SENDER_EMAIL = 'noreply@gosafrat.com';
 
 // Token generation and validation
