@@ -265,7 +265,7 @@ export default function AuthPage() {
                                 {t("First Name", "الاسم الأول")}
                               </FormLabel>
                               <FormControl>
-                                <Input placeholder={t("Enter your first name", "أدخل اسمك الأول")} {...field} value={field.value || ""} />
+                                <Input placeholder={t("Enter your first name", "أدخل اسمك الأول")} {...field} value={(field.value || "") as string} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -280,7 +280,7 @@ export default function AuthPage() {
                                 {t("Last Name", "اسم العائلة")}
                               </FormLabel>
                               <FormControl>
-                                <Input placeholder={t("Enter your last name", "أدخل اسم العائلة")} {...field} />
+                                <Input placeholder={t("Enter your last name", "أدخل اسم العائلة")} {...field} value={(field.value || "") as string} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
