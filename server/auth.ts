@@ -90,25 +90,29 @@ export function setupAuth(app: Express) {
       });
 
       // Log the user in
-      req.login(user, (err) => {
+      req.login(user, (err: Error | null) => {
         if (err) return next(err);
         // Send back user object without the password
         const { password, ...userWithoutPassword } = user;
         res.status(201).json(userWithoutPassword);
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Registration error:", error);
-      res.status(500).json({ message: "Registration failed", error: error.message });
+      if (error instanceof Error) {
+        res.status(500).json({ message: "Registration failed", error: error.message });
+      } else {
+        res.status(500).json({ message: "Registration failed", error: "Unknown error" });
+      }
     }
   });
 
   app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err, user, info) => {
+    passport.authenticate("local", (err: Error | null, user: Express.User | false, info: any) => {
       if (err) return next(err);
       if (!user) {
         return res.status(401).json({ message: "Invalid username or password" });
       }
-      req.login(user, (err) => {
+      req.login(user, (err: Error | null) => {
         if (err) return next(err);
         // Send back user object without the password
         const { password, ...userWithoutPassword } = user;
@@ -118,7 +122,7 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/logout", (req, res, next) => {
-    req.logout((err) => {
+    req.logout((err: Error | null) => {
       if (err) return next(err);
       res.sendStatus(200);
     });
@@ -159,9 +163,13 @@ export function setupAuth(app: Express) {
       // Send back user object without the password
       const { password: pwd, ...userWithoutPassword } = updatedUser;
       res.json(userWithoutPassword);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Profile update error:", error);
-      res.status(500).json({ message: "Profile update failed", error: error.message });
+      if (error instanceof Error) {
+        res.status(500).json({ message: "Profile update failed", error: error.message });
+      } else {
+        res.status(500).json({ message: "Profile update failed", error: "Unknown error" });
+      }
     }
   });
 
@@ -184,9 +192,13 @@ export function setupAuth(app: Express) {
       await storage.updateUser(req.user.id, { password: hashedNewPassword });
       
       res.json({ message: "Password updated successfully" });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Password change error:", error);
-      res.status(500).json({ message: "Password change failed", error: error.message });
+      if (error instanceof Error) {
+        res.status(500).json({ message: "Password change failed", error: error.message });
+      } else {
+        res.status(500).json({ message: "Password change failed", error: "Unknown error" });
+      }
     }
   });
 
@@ -209,9 +221,13 @@ export function setupAuth(app: Express) {
         hotels: hotelBookings,
         cars: carRentals
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Bookings retrieval error:", error);
-      res.status(500).json({ message: "Failed to retrieve bookings", error: error.message });
+      if (error instanceof Error) {
+        res.status(500).json({ message: "Failed to retrieve bookings", error: error.message });
+      } else {
+        res.status(500).json({ message: "Failed to retrieve bookings", error: "Unknown error" });
+      }
     }
   });
 }

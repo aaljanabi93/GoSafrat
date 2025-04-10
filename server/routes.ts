@@ -28,6 +28,9 @@ const stripe = process.env.STRIPE_SECRET_KEY
 const TRAVELPAYOUTS_API_BASE = "https://api.travelpayouts.com/v1";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup authentication routes and middleware
+  setupAuth(app);
+  
   // Health check endpoint
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
