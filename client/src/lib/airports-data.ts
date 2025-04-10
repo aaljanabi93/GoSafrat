@@ -181,12 +181,37 @@ export const getAirportsByRegion = (region: Airport['region']): Airport[] => {
 
 export const searchAirports = (query: string): Airport[] => {
   const lowercaseQuery = query.toLowerCase();
-  return airports.filter(airport => 
+  
+  // First, filter airports that match the query
+  const filteredAirports = airports.filter(airport => 
     airport.code.toLowerCase().includes(lowercaseQuery) || 
     airport.name.toLowerCase().includes(lowercaseQuery) || 
     airport.city.toLowerCase().includes(lowercaseQuery) || 
     airport.country.toLowerCase().includes(lowercaseQuery)
   );
+  
+  // Then, sort them with multiple criteria:
+  // 1. Airports whose code starts with the query come first
+  // 2. Airports whose city starts with the query come next
+  // 3. Finally, sort alphabetically by city name
+  return filteredAirports.sort((a, b) => {
+    // Prioritize airports with codes that start with the query
+    const aCodeStarts = a.code.toLowerCase().startsWith(lowercaseQuery);
+    const bCodeStarts = b.code.toLowerCase().startsWith(lowercaseQuery);
+    
+    if (aCodeStarts && !bCodeStarts) return -1;
+    if (!aCodeStarts && bCodeStarts) return 1;
+    
+    // Next, prioritize airports with cities that start with the query
+    const aCityStarts = a.city.toLowerCase().startsWith(lowercaseQuery);
+    const bCityStarts = b.city.toLowerCase().startsWith(lowercaseQuery);
+    
+    if (aCityStarts && !bCityStarts) return -1;
+    if (!aCityStarts && bCityStarts) return 1;
+    
+    // Finally, sort alphabetically by city name
+    return a.city.localeCompare(b.city);
+  });
 };
 
 export const getPopularAirports = (): Airport[] => {
