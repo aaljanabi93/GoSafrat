@@ -4,6 +4,7 @@ import { useBooking } from "@/context/booking-context";
 import { FlightBookingData } from "@/context/booking-context";
 import { useCurrency } from "@/context/currency-context";
 import { useLocation } from "wouter";
+import { api } from "@/lib/api";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
@@ -19,86 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Helmet } from "react-helmet";
 import { ChevronRight, ChevronLeft, ArrowRight, ArrowLeft, Edit } from "lucide-react";
 
-// Mock flight data for demonstration
-const flightResults = [
-  {
-    id: 1,
-    airline: {
-      name: "Emirates",
-      nameAr: "طيران الإمارات",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/d/d0/Emirates_logo.svg",
-      flightNumber: "EK506",
-      aircraft: "Boeing 777"
-    },
-    departure: {
-      time: "07:45",
-      airport: "DXB",
-      city: "Dubai",
-      date: "2023-09-25"
-    },
-    arrival: {
-      time: "11:35",
-      airport: "AMM",
-      city: "Amman",
-      date: "2023-09-25"
-    },
-    duration: "7h 50m",
-    direct: true,
-    price: 645,
-    baggage: {
-      cabin: "7kg",
-      checked: "30kg"
-    },
-    stops: [],
-    visaRequired: true
-  },
-  {
-    id: 2,
-    airline: {
-      name: "British Airways",
-      nameAr: "الخطوط البريطانية",
-      logo: "https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/British_Airways_Logo.svg/250px-British_Airways_Logo.svg.png",
-      flightNumber: "BA108",
-      aircraft: "Airbus A380"
-    },
-    departure: {
-      time: "09:25",
-      airport: "DXB",
-      date: "2023-09-25"
-    },
-    arrival: {
-      time: "13:40",
-      airport: "LHR",
-      date: "2023-09-25"
-    },
-    duration: "8h 15m",
-    direct: true,
-    price: 598
-  },
-  {
-    id: 3,
-    airline: {
-      name: "Qatar Airways",
-      nameAr: "القطرية",
-      logo: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f4/Qatar_Airways_Logo.svg/1200px-Qatar_Airways_Logo.svg.png",
-      flightNumber: "QR8",
-      aircraft: "Boeing 787"
-    },
-    departure: {
-      time: "08:15",
-      airport: "DXB",
-      date: "2023-09-25"
-    },
-    arrival: {
-      time: "12:45",
-      airport: "LHR",
-      date: "2023-09-25"
-    },
-    duration: "8h 30m",
-    direct: true,
-    price: 612
-  }
-];
+// We'll use real flight data from the API instead of mocks
 
 export default function Flights() {
   const { t, language } = useLanguage();
@@ -107,31 +29,132 @@ export default function Flights() {
   const [location, navigate] = useLocation();
   const { toast } = useToast();
 
-  const [flights, setFlights] = useState(flightResults);
+  const [flights, setFlights] = useState<any[]>([]);
   const [sortOption, setSortOption] = useState("price-asc");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   // Set document title
   useEffect(() => {
     document.title = t("Flight Search Results - Safrat Travel", "نتائج البحث عن الرحلات - سفرات");
   }, [language, t]);
 
-  // Sort flights when option changes
+  // Fetch flights data from API
   useEffect(() => {
-    let sortedFlights = [...flightResults];
+    async function fetchFlights() {
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        // Default search params if no booking context exists
+        const departDate = currentBooking?.type === "flight" 
+          ? new Date(currentBooking.departureTime).toISOString().split('T')[0]
+          : new Date().toISOString().split('T')[0];
+        
+        const returnDate = currentBooking?.type === "flight" && currentBooking.returnFlight && currentBooking.returnDepartureTime
+          ? new Date(currentBooking.returnDepartureTime).toISOString().split('T')[0]
+          : '';
+        
+        const origin = currentBooking?.type === "flight" 
+          ? currentBooking.departureAirport
+          : "DXB";
+          
+        const destination = currentBooking?.type === "flight" 
+          ? currentBooking.arrivalAirport
+          : "AMM";
+  
+        // API call
+        const response = await api.searchFlights({
+          origin,
+          destination,
+          departDate,
+          returnDate,
+          adults: currentBooking?.type === "flight" ? currentBooking.passengers : 1,
+          currency: "USD"
+        });
+
+        if (!response.success) {
+          throw new Error(response.message || "Failed to fetch flights");
+        }
+
+        // Process API response to our required format
+        const processedFlights: any[] = [];
+        const data = response.data || {};
+        
+        // Loop through destination airports
+        Object.keys(data).forEach(destCode => {
+          // Loop through flights to that destination
+          Object.keys(data[destCode]).forEach(flightNum => {
+            const apiFlightData = data[destCode][flightNum];
+            
+            // Create a flight object with our required structure
+            processedFlights.push({
+              id: `${apiFlightData.airline}${apiFlightData.flight_number}`,
+              price: apiFlightData.price,
+              airline: apiFlightData.airline || {},
+              departure: apiFlightData.departure || {
+                time: "00:00",
+                airport: origin,
+                city: "Unknown",
+                date: departDate
+              },
+              arrival: apiFlightData.arrival || {
+                time: "00:00",
+                airport: destCode,
+                city: "Unknown",
+                date: departDate
+              },
+              duration: apiFlightData.duration || "Unknown",
+              direct: apiFlightData.direct !== undefined ? apiFlightData.direct : true,
+              baggage: apiFlightData.baggage || { cabin: "7kg", checked: "20kg" },
+              stops: apiFlightData.stops || [],
+              visaRequired: apiFlightData.visaRequired !== undefined ? apiFlightData.visaRequired : false
+            });
+          });
+        });
+
+        // Sort the flights
+        sortFlights(processedFlights, sortOption);
+      } catch (err: any) {
+        console.error("Error fetching flights:", err);
+        setError(err.message || "Failed to fetch flights");
+        toast({
+          title: t("Error", "خطأ"),
+          description: t("Failed to fetch flights. Please try again.", "فشل في جلب الرحلات. يرجى المحاولة مرة أخرى."),
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchFlights();
+  }, [currentBooking]);
+
+  // Sort flights when option changes
+  const sortFlights = (flightsToSort: any[], option: string) => {
+    let sortedFlights = [...flightsToSort];
     
-    if (sortOption === "price-asc") {
+    if (option === "price-asc") {
       sortedFlights.sort((a, b) => a.price - b.price);
-    } else if (sortOption === "price-desc") {
+    } else if (option === "price-desc") {
       sortedFlights.sort((a, b) => b.price - a.price);
-    } else if (sortOption === "duration-asc") {
+    } else if (option === "duration-asc") {
       sortedFlights.sort((a, b) => {
-        const durationA = parseInt(a.duration.split('h')[0]);
-        const durationB = parseInt(b.duration.split('h')[0]);
+        const durationA = a.duration?.split('h')[0] ? parseInt(a.duration.split('h')[0]) : 0;
+        const durationB = b.duration?.split('h')[0] ? parseInt(b.duration.split('h')[0]) : 0;
         return durationA - durationB;
       });
     }
     
     setFlights(sortedFlights);
+  };
+  
+  // Handle sort option change
+  useEffect(() => {
+    if (flights.length > 0) {
+      sortFlights(flights, sortOption);
+    }
   }, [sortOption]);
 
   const handleSelectFlight = (flight: any) => {
@@ -245,9 +268,40 @@ export default function Flights() {
             </div>
             
             <div className="space-y-4">
-              {flights.map((flight) => (
+              {isLoading ? (
+                <div className="flex justify-center items-center py-12">
+                  <div className="animate-spin w-12 h-12 border-4 border-primary border-t-transparent rounded-full"></div>
+                </div>
+              ) : error ? (
+                <div className="text-center py-8">
+                  <div className="text-lg text-red-500 mb-2">
+                    {t("Error loading flights", "خطأ في تحميل الرحلات")}
+                  </div>
+                  <div className="text-sm text-gray-500 mb-4">{error}</div>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => navigate("/")}
+                    className={language === 'ar' ? 'font-cairo' : ''}
+                  >
+                    {t("Back to search", "العودة إلى البحث")}
+                  </Button>
+                </div>
+              ) : flights.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="text-lg text-gray-500 mb-2">
+                    {t("No flights found for this route and date", "لم يتم العثور على رحلات لهذا المسار والتاريخ")}
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => navigate("/")}
+                    className={language === 'ar' ? 'font-cairo' : ''}
+                  >
+                    {t("Modify your search", "تعديل البحث")}
+                  </Button>
+                </div>
+              ) : flights.map((flight) => (
                 <Card 
-                  key={flight.id}
+                  key={flight.id || Math.random().toString()}
                   className="border border-gray-200 hover:shadow-md transition"
                 >
                   <CardContent className="p-4">
