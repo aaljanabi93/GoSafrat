@@ -12,8 +12,8 @@ export default function Footer() {
           {/* Company Info */}
           <div>
             <div className="flex items-center mb-4">
-              <span className="text-white text-2xl font-poppins font-bold">Safrat</span>
-              <span className="text-[#28B67A] text-2xl font-poppins font-light">Travel</span>
+              <span className="text-white text-2xl font-poppins font-bold">Go</span>
+              <span className="text-[#28B67A] text-2xl font-poppins font-bold">Safrat</span>
             </div>
             <p className={`text-gray-400 mb-4 ${language === 'ar' ? 'font-cairo' : ''}`}>
               {t("Your trusted partner for flights, hotels, and car rentals worldwide.", 
@@ -102,7 +102,7 @@ export default function Footer() {
         <div className="border-t border-gray-800 pt-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className={`text-gray-400 text-sm mb-4 md:mb-0 ${language === 'ar' ? 'font-cairo' : ''}`}>
-              {t("© 2023 Safrat Travel. All rights reserved.", "© 2023 سفرات للسفر. جميع الحقوق محفوظة.")}
+              {t("© 2025 GoSafrat. All rights reserved.", "© 2025 جوسفرات. جميع الحقوق محفوظة.")}
             </p>
             
             <div className="flex items-center">
