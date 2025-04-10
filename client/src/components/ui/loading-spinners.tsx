@@ -37,7 +37,7 @@ export function LoadingSpinner({
     );
   }
 
-  // Boeing 787 Dreamliner spinner
+  // Simple airplane spinner
   if (variant === "plane") {
     return (
       <div
@@ -54,103 +54,38 @@ export function LoadingSpinner({
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            {/* Outer guide circle */}
+            {/* Simple circle background */}
             <circle 
               cx="12" 
               cy="12" 
               r="10" 
               stroke="currentColor" 
               strokeWidth="0.5" 
-              strokeOpacity="0.2" 
+              strokeOpacity="0.3" 
             />
             
-            {/* Fuselage - Dreamliner has a distinctive sleek body */}
+            {/* Simple aircraft body */}
             <path
-              d="M10 5.5C10 5.5 8 6 8 7.5C8 9 8 16 8 17.5C8 19 10 19.5 12 19.5C14 19.5 16 19 16 17.5C16 16 16 9 16 7.5C16 6 14 5.5 14 5.5"
+              d="M7 12H17"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            
+            {/* Wings */}
+            <path
+              d="M12 7V17"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            
+            {/* Tail */}
+            <path
+              d="M12 7L15 4"
               stroke="currentColor"
               strokeWidth="1.5"
               strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            
-            {/* Nose cone - Dreamliner has a distinctive pointy nose */}
-            <path
-              d="M10 5.5C10 5.5 11 4.5 12 4.5C13 4.5 14 5.5 14 5.5"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            
-            {/* Wings - Dreamliner has distinctive swept back wings with upturned tips */}
-            <path
-              d="M16 11C16 11 18 10.5 19.5 11C21 11.5 21.5 12.5 21.5 12.5"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            />
-            <path
-              d="M8 11C8 11 6 10.5 4.5 11C3 11.5 2.5 12.5 2.5 12.5"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            />
-            
-            {/* Tail section - Dreamliner has a distinctive curved tail fin */}
-            <path
-              d="M12 19.5C12 19.5 12 20.5 12 21"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-            <path
-              d="M12 21L14 18"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            
-            {/* Windows - Small accent details */}
-            <path
-              d="M9.5 8H14.5"
-              stroke="currentColor"
-              strokeWidth="0.5"
-              strokeDasharray="0.5 0.5"
-            />
-            <path
-              d="M9.5 10H14.5"
-              stroke="currentColor"
-              strokeWidth="0.5"
-              strokeDasharray="0.5 0.5"
-            />
-            <path
-              d="M9.5 12H14.5"
-              stroke="currentColor"
-              strokeWidth="0.5"
-              strokeDasharray="0.5 0.5"
-            />
-            <path
-              d="M9.5 14H14.5"
-              stroke="currentColor"
-              strokeWidth="0.5"
-              strokeDasharray="0.5 0.5"
-            />
-            
-            {/* Engines - Dreamliner's bigger engines */}
-            <ellipse
-              cx="5.5"
-              cy="11.5"
-              rx="1"
-              ry="0.8"
-              fill="currentColor"
-            />
-            <ellipse
-              cx="18.5"
-              cy="11.5"
-              rx="1"
-              ry="0.8"
-              fill="currentColor"
             />
           </svg>
         </div>
