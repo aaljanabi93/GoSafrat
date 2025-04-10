@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -9,6 +9,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { User } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Save, UserCircle } from "lucide-react";
+import { useLocation } from "wouter";
 
 import {
   Form,
@@ -51,7 +52,21 @@ export default function ProfilePage() {
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const { toast } = useToast();
+  const [location] = useLocation();
   const [activeTab, setActiveTab] = useState<"profile" | "security" | "bookings">("profile");
+  
+  // Check for tab parameter in URL
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const tab = searchParams.get('tab');
+    if (tab === 'security') {
+      setActiveTab('security');
+    } else if (tab === 'bookings') {
+      setActiveTab('bookings');
+    } else if (tab === 'profile') {
+      setActiveTab('profile');
+    }
+  }, [location]);
 
   // Get user bookings
   const { data: bookings, isLoading: bookingsLoading } = useQuery({

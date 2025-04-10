@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { Redirect } from "wouter";
+import { Redirect, useLocation } from "wouter";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -44,7 +44,19 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 export default function AuthPage() {
   const { t, language } = useLanguage();
   const { user, loginMutation, registerMutation } = useAuth();
+  const [location] = useLocation();
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
+  
+  // Check if the URL contains the tab parameter
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const tab = searchParams.get('tab');
+    if (tab === 'register') {
+      setActiveTab('register');
+    } else if (tab === 'login') {
+      setActiveTab('login');
+    }
+  }, [location]);
 
   // If user is already logged in, redirect to home
   if (user) {
@@ -72,6 +84,7 @@ export default function AuthPage() {
       lastName: "",
       phoneNumber: "",
     },
+    mode: "onChange", // Validate on change
   });
 
   // Form submission handlers
