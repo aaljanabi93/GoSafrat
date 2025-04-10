@@ -262,8 +262,8 @@ const BookingDetailsForm = ({ onContinue }: { onContinue: () => void }) => {
                       <SelectGroup>
                         <SelectLabel>{t("Asia", "آسيا")}</SelectLabel>
                         {nationalities
-                          .filter(n => n.region === "Asia")
-                          .map(nationality => (
+                          .filter((n: Nationality) => n.region === "Asia")
+                          .map((nationality: Nationality) => (
                             <SelectItem 
                               key={nationality.code} 
                               value={nationality.code}
@@ -278,8 +278,8 @@ const BookingDetailsForm = ({ onContinue }: { onContinue: () => void }) => {
                       <SelectGroup>
                         <SelectLabel>{t("Africa", "أفريقيا")}</SelectLabel>
                         {nationalities
-                          .filter(n => n.region === "Africa")
-                          .map(nationality => (
+                          .filter((n: Nationality) => n.region === "Africa")
+                          .map((nationality: Nationality) => (
                             <SelectItem 
                               key={nationality.code} 
                               value={nationality.code}
@@ -294,8 +294,8 @@ const BookingDetailsForm = ({ onContinue }: { onContinue: () => void }) => {
                       <SelectGroup>
                         <SelectLabel>{t("South America", "أمريكا الجنوبية")}</SelectLabel>
                         {nationalities
-                          .filter(n => n.region === "South America")
-                          .map(nationality => (
+                          .filter((n: Nationality) => n.region === "South America")
+                          .map((nationality: Nationality) => (
                             <SelectItem 
                               key={nationality.code} 
                               value={nationality.code}
@@ -310,8 +310,8 @@ const BookingDetailsForm = ({ onContinue }: { onContinue: () => void }) => {
                       <SelectGroup>
                         <SelectLabel>{t("Oceania", "أوقيانوسيا")}</SelectLabel>
                         {nationalities
-                          .filter(n => n.region === "Oceania")
-                          .map(nationality => (
+                          .filter((n: Nationality) => n.region === "Oceania")
+                          .map((nationality: Nationality) => (
                             <SelectItem 
                               key={nationality.code} 
                               value={nationality.code}
