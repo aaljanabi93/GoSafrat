@@ -481,14 +481,6 @@ export default function Checkout() {
     return null; // This will redirect through the useEffect
   }
   
-  // Stripe payment options
-  const stripeOptions = {
-    clientSecret,
-    appearance: {
-      theme: 'stripe' as const,
-    },
-  };
-  
   // Options for Stripe Elements when setting up the payment form
   const stripeOptions = {
     clientSecret,
@@ -519,83 +511,80 @@ export default function Checkout() {
                   <h3 className={`text-xl font-semibold mb-4 ${language === 'ar' ? 'font-cairo' : ''}`}>
                     {t("Booking Summary", "ملخص الحجز")}
                   </h3>
-                    
-                    {bookingDetails && (
-                      <>
-                        <div className="flex justify-between items-center mb-4">
-                          <p className={`font-medium text-gray-700 ${language === 'ar' ? 'font-cairo' : ''}`}>
-                            {bookingDetails.title}
-                          </p>
-                          {bookingDetails.airlineLogo && (
-                            <img 
-                              src={bookingDetails.airlineLogo} 
-                              alt="Airline Logo" 
-                              className="h-8 w-auto object-contain"
-                            />
-                          )}
-                        </div>
-                        
-                        <div className="space-y-2 mb-4">
-                          {bookingDetails.details.map((detail, index) => (
-                            <div key={index} className="flex justify-between">
-                              <span className={`text-sm text-gray-600 ${language === 'ar' ? 'font-cairo' : ''}`}>
-                                {detail.label}:
-                              </span>
-                              <span className={`text-sm font-medium text-right ml-2 ${language === 'ar' ? 'font-cairo mr-2 ml-0' : ''}`}>
-                                {detail.value}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                        
-                        <Separator className="my-4" />
-                        
-                        <div className="flex justify-between font-medium">
-                          <span className={language === 'ar' ? 'font-cairo' : ''}>
-                            {t("Total", "المجموع")}:
-                          </span>
-                          <span className="text-primary font-bold">{formatPrice(currentBooking.price)}</span>
-                        </div>
-                        
-                        <p className={`text-xs text-gray-500 mt-2 ${language === 'ar' ? 'font-cairo' : ''}`}>
-                          {t("Including taxes and fees", "شامل الضرائب والرسوم")}
+                  
+                  {bookingDetails && (
+                    <>
+                      <div className="flex justify-between items-center mb-4">
+                        <p className={`font-medium text-gray-700 ${language === 'ar' ? 'font-cairo' : ''}`}>
+                          {bookingDetails.title}
                         </p>
-                      </>
-                    )}
+                        {bookingDetails.airlineLogo && (
+                          <img 
+                            src={bookingDetails.airlineLogo} 
+                            alt="Airline Logo" 
+                            className="h-8 w-auto object-contain"
+                          />
+                        )}
+                      </div>
+                      
+                      <div className="space-y-2 mb-4">
+                        {bookingDetails.details.map((detail, index) => (
+                          <div key={index} className="flex justify-between">
+                            <span className={`text-sm text-gray-600 ${language === 'ar' ? 'font-cairo' : ''}`}>
+                              {detail.label}:
+                            </span>
+                            <span className={`text-sm font-medium text-right ml-2 ${language === 'ar' ? 'font-cairo mr-2 ml-0' : ''}`}>
+                              {detail.value}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <Separator className="my-4" />
+                      
+                      <div className="flex justify-between font-medium">
+                        <span className={language === 'ar' ? 'font-cairo' : ''}>
+                          {t("Total", "المجموع")}:
+                        </span>
+                        <span className="text-primary font-bold">{formatPrice(currentBooking.price)}</span>
+                      </div>
+                      
+                      <p className={`text-xs text-gray-500 mt-2 ${language === 'ar' ? 'font-cairo' : ''}`}>
+                        {t("Including taxes and fees", "شامل الضرائب والرسوم")}
+                      </p>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Forms section - Below the booking summary */}
+            <div className="space-y-6">
+              {step === 1 && (
+                <BookingDetailsForm onContinue={() => setStep(2)} />
+              )}
+              
+              {step === 2 && clientSecret && (
+                <Elements stripe={stripePromise} options={stripeOptions}>
+                  <PaymentForm clientSecret={clientSecret} />
+                </Elements>
+              )}
+              
+              {step === 2 && isLoading && (
+                <Card>
+                  <CardContent className="p-6 flex justify-center items-center min-h-[300px]">
+                    <div className="flex flex-col items-center">
+                      <svg className="animate-spin h-10 w-10 text-primary mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <p className={language === 'ar' ? 'font-cairo' : ''}>
+                        {t("Setting up payment...", "جارٍ إعداد الدفع...")}
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
-              </div>
-              
-              {/* Forms section - Moved below the booking summary */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-3 space-y-6">
-                  {step === 1 && (
-                    <BookingDetailsForm onContinue={() => setStep(2)} />
-                  )}
-                  
-                  {step === 2 && clientSecret && (
-                    <Elements stripe={stripePromise} options={stripeOptions}>
-                      <PaymentForm clientSecret={clientSecret} />
-                    </Elements>
-                  )}
-                  
-                  {step === 2 && isLoading && (
-                    <Card>
-                      <CardContent className="p-6 flex justify-center items-center min-h-[300px]">
-                        <div className="flex flex-col items-center">
-                          <svg className="animate-spin h-10 w-10 text-primary mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          <p className={language === 'ar' ? 'font-cairo' : ''}>
-                            {t("Setting up payment...", "جارٍ إعداد الدفع...")}
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </main>

@@ -7,7 +7,7 @@ import Home from "@/pages/home";
 import Flights from "@/pages/flights";
 import Hotels from "@/pages/hotels";
 import Cars from "@/pages/cars";
-import Checkout from "@/pages/checkout";
+import Checkout from "@/pages/checkout-fixed";
 import BookingSuccess from "@/pages/booking-success";
 import { LanguageProvider } from "@/context/language-context";
 import { BookingProvider } from "@/context/booking-context";
