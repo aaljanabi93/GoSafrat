@@ -1,4 +1,5 @@
 import { pgTable, text, serial, integer, boolean, jsonb, timestamp, numeric } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -122,3 +123,39 @@ export type InsertCarRental = z.infer<typeof insertCarRentalSchema>;
 
 export type Payment = typeof payments.$inferSelect;
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;
+
+// Define relations between tables
+export const usersRelations = relations(users, ({ many }) => ({
+  flightBookings: many(flightBookings),
+  hotelBookings: many(hotelBookings),
+  carRentals: many(carRentals),
+  payments: many(payments)
+}));
+
+export const flightBookingsRelations = relations(flightBookings, ({ one }) => ({
+  user: one(users, {
+    fields: [flightBookings.userId],
+    references: [users.id]
+  })
+}));
+
+export const hotelBookingsRelations = relations(hotelBookings, ({ one }) => ({
+  user: one(users, {
+    fields: [hotelBookings.userId],
+    references: [users.id]
+  })
+}));
+
+export const carRentalsRelations = relations(carRentals, ({ one }) => ({
+  user: one(users, {
+    fields: [carRentals.userId],
+    references: [users.id]
+  })
+}));
+
+export const paymentsRelations = relations(payments, ({ one }) => ({
+  user: one(users, {
+    fields: [payments.userId],
+    references: [users.id]
+  })
+}));

@@ -39,59 +39,37 @@ export interface IStorage {
   updatePayment(id: number, paymentData: Partial<Payment>): Promise<Payment>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private flightBookings: Map<number, FlightBooking>;
-  private hotelBookings: Map<number, HotelBooking>;
-  private carRentals: Map<number, CarRental>;
-  private payments: Map<number, Payment>;
-  
-  private userCurrentId: number;
-  private flightBookingCurrentId: number;
-  private hotelBookingCurrentId: number;
-  private carRentalCurrentId: number;
-  private paymentCurrentId: number;
+import { db } from "./db";
+import { eq, and } from "drizzle-orm";
 
-  constructor() {
-    this.users = new Map();
-    this.flightBookings = new Map();
-    this.hotelBookings = new Map();
-    this.carRentals = new Map();
-    this.payments = new Map();
-    
-    this.userCurrentId = 1;
-    this.flightBookingCurrentId = 1;
-    this.hotelBookingCurrentId = 1;
-    this.carRentalCurrentId = 1;
-    this.paymentCurrentId = 1;
-  }
-
+export class DatabaseStorage implements IStorage {
   // User methods
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.userCurrentId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
   async updateUser(id: number, userData: Partial<User>): Promise<User> {
-    const user = await this.getUser(id);
-    if (!user) {
+    const [updatedUser] = await db
+      .update(users)
+      .set(userData)
+      .where(eq(users.id, id))
+      .returning();
+      
+    if (!updatedUser) {
       throw new Error(`User with ID ${id} not found`);
     }
     
-    const updatedUser = { ...user, ...userData };
-    this.users.set(id, updatedUser);
     return updatedUser;
   }
 
@@ -101,123 +79,163 @@ export class MemStorage implements IStorage {
 
   // Flight booking methods
   async createFlightBooking(booking: InsertFlightBooking): Promise<FlightBooking> {
-    const id = this.flightBookingCurrentId++;
-    const now = new Date();
-    const flightBooking: FlightBooking = { ...booking, id, createdAt: now };
-    this.flightBookings.set(id, flightBooking);
+    const [flightBooking] = await db
+      .insert(flightBookings)
+      .values(booking)
+      .returning();
+      
     return flightBooking;
   }
 
   async getFlightBooking(id: number): Promise<FlightBooking | undefined> {
-    return this.flightBookings.get(id);
+    const [booking] = await db
+      .select()
+      .from(flightBookings)
+      .where(eq(flightBookings.id, id));
+      
+    return booking || undefined;
   }
 
   async getFlightBookingsByUser(userId: number): Promise<FlightBooking[]> {
-    return Array.from(this.flightBookings.values()).filter(
-      (booking) => booking.userId === userId,
-    );
+    return db
+      .select()
+      .from(flightBookings)
+      .where(eq(flightBookings.userId, userId));
   }
 
   async updateFlightBooking(id: number, bookingData: Partial<FlightBooking>): Promise<FlightBooking> {
-    const booking = await this.getFlightBooking(id);
-    if (!booking) {
+    const [updatedBooking] = await db
+      .update(flightBookings)
+      .set(bookingData)
+      .where(eq(flightBookings.id, id))
+      .returning();
+      
+    if (!updatedBooking) {
       throw new Error(`Flight booking with ID ${id} not found`);
     }
     
-    const updatedBooking = { ...booking, ...bookingData };
-    this.flightBookings.set(id, updatedBooking);
     return updatedBooking;
   }
 
   // Hotel booking methods
   async createHotelBooking(booking: InsertHotelBooking): Promise<HotelBooking> {
-    const id = this.hotelBookingCurrentId++;
-    const now = new Date();
-    const hotelBooking: HotelBooking = { ...booking, id, createdAt: now };
-    this.hotelBookings.set(id, hotelBooking);
+    const [hotelBooking] = await db
+      .insert(hotelBookings)
+      .values(booking)
+      .returning();
+      
     return hotelBooking;
   }
 
   async getHotelBooking(id: number): Promise<HotelBooking | undefined> {
-    return this.hotelBookings.get(id);
+    const [booking] = await db
+      .select()
+      .from(hotelBookings)
+      .where(eq(hotelBookings.id, id));
+      
+    return booking || undefined;
   }
 
   async getHotelBookingsByUser(userId: number): Promise<HotelBooking[]> {
-    return Array.from(this.hotelBookings.values()).filter(
-      (booking) => booking.userId === userId,
-    );
+    return db
+      .select()
+      .from(hotelBookings)
+      .where(eq(hotelBookings.userId, userId));
   }
 
   async updateHotelBooking(id: number, bookingData: Partial<HotelBooking>): Promise<HotelBooking> {
-    const booking = await this.getHotelBooking(id);
-    if (!booking) {
+    const [updatedBooking] = await db
+      .update(hotelBookings)
+      .set(bookingData)
+      .where(eq(hotelBookings.id, id))
+      .returning();
+      
+    if (!updatedBooking) {
       throw new Error(`Hotel booking with ID ${id} not found`);
     }
     
-    const updatedBooking = { ...booking, ...bookingData };
-    this.hotelBookings.set(id, updatedBooking);
     return updatedBooking;
   }
 
   // Car rental methods
   async createCarRental(rental: InsertCarRental): Promise<CarRental> {
-    const id = this.carRentalCurrentId++;
-    const now = new Date();
-    const carRental: CarRental = { ...rental, id, createdAt: now };
-    this.carRentals.set(id, carRental);
+    const [carRental] = await db
+      .insert(carRentals)
+      .values(rental)
+      .returning();
+      
     return carRental;
   }
 
   async getCarRental(id: number): Promise<CarRental | undefined> {
-    return this.carRentals.get(id);
+    const [rental] = await db
+      .select()
+      .from(carRentals)
+      .where(eq(carRentals.id, id));
+      
+    return rental || undefined;
   }
 
   async getCarRentalsByUser(userId: number): Promise<CarRental[]> {
-    return Array.from(this.carRentals.values()).filter(
-      (rental) => rental.userId === userId,
-    );
+    return db
+      .select()
+      .from(carRentals)
+      .where(eq(carRentals.userId, userId));
   }
 
   async updateCarRental(id: number, rentalData: Partial<CarRental>): Promise<CarRental> {
-    const rental = await this.getCarRental(id);
-    if (!rental) {
+    const [updatedRental] = await db
+      .update(carRentals)
+      .set(rentalData)
+      .where(eq(carRentals.id, id))
+      .returning();
+      
+    if (!updatedRental) {
       throw new Error(`Car rental with ID ${id} not found`);
     }
     
-    const updatedRental = { ...rental, ...rentalData };
-    this.carRentals.set(id, updatedRental);
     return updatedRental;
   }
 
   // Payment methods
   async createPayment(payment: InsertPayment): Promise<Payment> {
-    const id = this.paymentCurrentId++;
-    const now = new Date();
-    const newPayment: Payment = { ...payment, id, createdAt: now };
-    this.payments.set(id, newPayment);
+    const [newPayment] = await db
+      .insert(payments)
+      .values(payment)
+      .returning();
+      
     return newPayment;
   }
 
   async getPayment(id: number): Promise<Payment | undefined> {
-    return this.payments.get(id);
+    const [payment] = await db
+      .select()
+      .from(payments)
+      .where(eq(payments.id, id));
+      
+    return payment || undefined;
   }
 
   async getPaymentsByUser(userId: number): Promise<Payment[]> {
-    return Array.from(this.payments.values()).filter(
-      (payment) => payment.userId === userId,
-    );
+    return db
+      .select()
+      .from(payments)
+      .where(eq(payments.userId, userId));
   }
 
   async updatePayment(id: number, paymentData: Partial<Payment>): Promise<Payment> {
-    const payment = await this.getPayment(id);
-    if (!payment) {
+    const [updatedPayment] = await db
+      .update(payments)
+      .set(paymentData)
+      .where(eq(payments.id, id))
+      .returning();
+      
+    if (!updatedPayment) {
       throw new Error(`Payment with ID ${id} not found`);
     }
     
-    const updatedPayment = { ...payment, ...paymentData };
-    this.payments.set(id, updatedPayment);
     return updatedPayment;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
