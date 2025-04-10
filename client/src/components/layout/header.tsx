@@ -48,20 +48,20 @@ export default function Header() {
         </div>
         
         {/* Navigation - Desktop */}
-        <nav className="hidden md:flex items-center space-x-6 font-medium text-gray-700">
-          <Link href="/" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo' : ''}`}>
+        <nav className={`hidden md:flex items-center ${language === 'ar' ? 'space-x-reverse' : 'space-x-6'} font-medium text-gray-700`}>
+          <Link href="/" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo text-right' : ''}`}>
             {t("Home", "الرئيسية")}
           </Link>
-          <Link href="/flights" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo' : ''}`}>
+          <Link href="/flights" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo text-right' : ''}`}>
             {t("Flights", "رحلات طيران")}
           </Link>
-          <Link href="/hotels" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo' : ''}`}>
+          <Link href="/hotels" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo text-right' : ''}`}>
             {t("Hotels", "فنادق")}
           </Link>
-          <Link href="/cars" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo' : ''}`}>
+          <Link href="/cars" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo text-right' : ''}`}>
             {t("Cars", "سيارات")}
           </Link>
-          <Link href="/" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo' : ''}`}>
+          <Link href="/" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo text-right' : ''}`}>
             {t("Deals", "عروض")}
           </Link>
         </nav>
@@ -107,25 +107,25 @@ export default function Header() {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 py-3">
-          <div className="container mx-auto px-4 flex flex-col space-y-3">
-            <Link href="/" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo' : ''}`}>
+          <div className={`container mx-auto px-4 flex flex-col space-y-3 ${language === 'ar' ? 'items-end' : ''}`}>
+            <Link href="/" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo text-right w-full' : ''}`}>
               {t("Home", "الرئيسية")}
             </Link>
-            <Link href="/flights" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo' : ''}`}>
+            <Link href="/flights" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo text-right w-full' : ''}`}>
               {t("Flights", "رحلات طيران")}
             </Link>
-            <Link href="/hotels" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo' : ''}`}>
+            <Link href="/hotels" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo text-right w-full' : ''}`}>
               {t("Hotels", "فنادق")}
             </Link>
-            <Link href="/cars" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo' : ''}`}>
+            <Link href="/cars" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo text-right w-full' : ''}`}>
               {t("Cars", "سيارات")}
             </Link>
-            <Link href="/" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo' : ''}`}>
+            <Link href="/" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo text-right w-full' : ''}`}>
               {t("Deals", "عروض")}
             </Link>
             
-            <div className="pt-2 border-t border-gray-100 flex items-center justify-between">
-              <span className={`text-sm text-gray-600 ${language === 'ar' ? 'font-cairo' : ''}`}>
+            <div className={`pt-2 border-t border-gray-100 flex items-center ${language === 'ar' ? 'flex-row-reverse' : 'justify-between'}`}>
+              <span className={`text-sm text-gray-600 ${language === 'ar' ? 'font-cairo mr-2' : ''}`}>
                 {t("Currency", "العملة")}:
               </span>
               <CurrencySelector />
