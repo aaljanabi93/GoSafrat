@@ -37,7 +37,7 @@ export function LoadingSpinner({
     );
   }
 
-  // Airplane spinner (A380)
+  // Aircraft spinner
   if (variant === "plane") {
     return (
       <div
@@ -54,71 +54,46 @@ export function LoadingSpinner({
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            {/* A380 Silhouette */}
-            <path
-              d="M22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12Z"
-              stroke="currentColor"
-              strokeWidth="0.5"
-              strokeOpacity="0.3"
+            {/* Circle background */}
+            <circle 
+              cx="12" 
+              cy="12" 
+              r="10" 
+              stroke="currentColor" 
+              strokeWidth="0.5" 
+              strokeOpacity="0.3" 
             />
-            {/* A380 Body */}
+            
+            {/* Aircraft fuselage */}
             <path
-              d="M21 12H3"
+              d="M12 5L12 19"
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
             />
-            {/* A380 Main Body */}
-            <path
-              d="M19 10C19 8.89543 18.1046 8 17 8H7C5.89543 8 5 8.89543 5 10V14C5 15.1046 5.89543 16 7 16H17C18.1046 16 19 15.1046 19 14V10Z"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            />
-            {/* Upper Deck */}
-            <path
-              d="M16 8V6.5C16 5.67157 15.3284 5 14.5 5H9.5C8.67157 5 8 5.67157 8 6.5V8"
-              stroke="currentColor"
-              strokeWidth="1"
-            />
+            
             {/* Wings */}
             <path
-              d="M5 12H2"
+              d="M5 12H19"
               stroke="currentColor"
-              strokeWidth="3"
+              strokeWidth="4"
               strokeLinecap="round"
             />
-            <path
-              d="M19 12H22"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-            />
-            {/* Engine 1 */}
-            <circle cx="4.5" cy="12" r="0.8" fill="currentColor" />
-            {/* Engine 2 */}
-            <circle cx="19.5" cy="12" r="0.8" fill="currentColor" />
-            {/* Engine 3 */}
-            <circle cx="7" cy="12" r="0.6" fill="currentColor" />
-            {/* Engine 4 */}
-            <circle cx="17" cy="12" r="0.6" fill="currentColor" />
-            {/* Windows */}
-            <path
-              d="M9 7H15"
-              stroke="currentColor"
-              strokeWidth="0.5"
-              strokeDasharray="0.5 0.5"
-            />
-            <path
-              d="M7 11H17"
-              stroke="currentColor"
-              strokeWidth="0.5"
-              strokeDasharray="0.5 0.5"
-            />
+            
             {/* Tail */}
             <path
-              d="M12 16V18.5C12 19.3284 12.6716 20 13.5 20H14"
+              d="M12 5L9 2"
               stroke="currentColor"
-              strokeWidth="1"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+            
+            {/* Nose */}
+            <circle
+              cx="12"
+              cy="19"
+              r="1"
+              fill="currentColor"
             />
           </svg>
         </div>
