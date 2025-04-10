@@ -550,34 +550,66 @@ export default function Checkout() {
                         )}
                       </div>
                       
-                      {/* Flight-specific visual summary */}
+                      {/* Flight-specific visual summary - Simplified */}
                       {currentBooking.type === "flight" && (
                         <div className="mb-6 bg-[#F8F9FA] p-4 rounded-lg border border-gray-200">
-                          <div className="flex items-center justify-between mb-1">
-                            <div className="text-center">
-                              <p className="text-2xl font-bold text-[#051C2C]">
-                                {new Date(currentBooking.departureTime).toLocaleTimeString([], {hour: 'numeric', minute:'2-digit', hour12: true})}
-                              </p>
-                              <p className="text-sm font-medium">{currentBooking.departureAirport}</p>
+                          <div className="flex flex-col space-y-4">
+                            {/* Duration and Stops */}
+                            <div className="bg-white p-3 rounded-md border border-gray-100 text-center">
+                              <span className="text-lg font-bold text-[#051C2C]">
+                                {currentBooking.duration || t("Flight Duration", "مدة الرحلة")}
+                              </span>
+                              <div className="text-sm text-gray-600 mt-1">
+                                {currentBooking.stops && currentBooking.stops.length > 0 
+                                  ? t(`${currentBooking.stops.length} Stop(s)`, `${currentBooking.stops.length} توقف`) 
+                                  : t("Direct Flight", "رحلة مباشرة")}
+                              </div>
                             </div>
                             
-                            <div className="flex-1 mx-4 relative px-2">
-                              <div className="h-0.5 bg-gray-300 w-full absolute top-4"></div>
-                              <div className="w-6 h-6 rounded-full bg-white border-2 border-[#051C2C] absolute top-1 left-0 -ml-3"></div>
-                              <div className="w-6 h-6 rounded-full bg-white border-2 border-[#051C2C] absolute top-1 right-0 -mr-3"></div>
-                              <div className="text-xs text-center mt-6 text-gray-600">{currentBooking.duration || t("Direct Flight", "رحلة مباشرة")}</div>
+                            {/* Departure & Arrival */}
+                            <div className="grid grid-cols-2 gap-4">
+                              {/* Departure */}
+                              <div className="bg-white p-3 rounded-md border border-gray-100">
+                                <div className="text-sm font-medium text-gray-500 mb-1">
+                                  {t("Departure", "المغادرة")}
+                                </div>
+                                <div className="text-lg font-bold text-[#051C2C]">
+                                  {currentBooking.departureTime 
+                                    ? (isNaN(new Date(currentBooking.departureTime).getTime())
+                                      ? t("Time TBD", "الوقت لاحقاً")
+                                      : new Date(currentBooking.departureTime).toLocaleTimeString([], {hour: 'numeric', minute:'2-digit', hour12: true}))
+                                    : t("Time TBD", "الوقت لاحقاً")
+                                  }
+                                </div>
+                                <div className="text-sm text-gray-700 mt-1">
+                                  {currentBooking.departureCity && currentBooking.departureAirport
+                                    ? `${currentBooking.departureCity} (${currentBooking.departureAirport})`
+                                    : currentBooking.departureAirport || currentBooking.departureCity || t("Departure Airport", "مطار المغادرة")
+                                  }
+                                </div>
+                              </div>
+                              
+                              {/* Arrival */}
+                              <div className="bg-white p-3 rounded-md border border-gray-100">
+                                <div className="text-sm font-medium text-gray-500 mb-1">
+                                  {t("Arrival", "الوصول")}
+                                </div>
+                                <div className="text-lg font-bold text-[#051C2C]">
+                                  {currentBooking.arrivalTime 
+                                    ? (isNaN(new Date(currentBooking.arrivalTime).getTime())
+                                      ? t("Time TBD", "الوقت لاحقاً")
+                                      : new Date(currentBooking.arrivalTime).toLocaleTimeString([], {hour: 'numeric', minute:'2-digit', hour12: true}))
+                                    : t("Time TBD", "الوقت لاحقاً")
+                                  }
+                                </div>
+                                <div className="text-sm text-gray-700 mt-1">
+                                  {currentBooking.arrivalCity && currentBooking.arrivalAirport
+                                    ? `${currentBooking.arrivalCity} (${currentBooking.arrivalAirport})`
+                                    : currentBooking.arrivalAirport || currentBooking.arrivalCity || t("Arrival Airport", "مطار الوصول")
+                                  }
+                                </div>
+                              </div>
                             </div>
-                            
-                            <div className="text-center">
-                              <p className="text-2xl font-bold text-[#051C2C]">
-                                {new Date(currentBooking.arrivalTime).toLocaleTimeString([], {hour: 'numeric', minute:'2-digit', hour12: true})}
-                              </p>
-                              <p className="text-sm font-medium">{currentBooking.arrivalAirport}</p>
-                            </div>
-                          </div>
-                          <div className="flex justify-between text-xs text-gray-500 mt-1">
-                            <div>{currentBooking.departureCity}</div>
-                            <div>{currentBooking.arrivalCity}</div>
                           </div>
                         </div>
                       )}
