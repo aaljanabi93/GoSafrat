@@ -33,14 +33,16 @@ export default function Header() {
 
   return (
     <header className={`bg-white sticky top-0 z-50 ${isScrolled ? 'shadow-md' : ''}`}>
-      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         {/* Logo */}
         <div className="flex items-center">
           <Link href="/" className="flex items-center">
             <div className="flex items-center">
-              <img src={logoImage} alt="GoSafrat Logo" className="h-10 mr-2" />
-              <span className="text-primary text-2xl font-poppins font-bold">Go</span>
-              <span className="text-[#e84c5e] text-2xl font-poppins font-medium">Safrat</span>
+              <img 
+                src={logoImage} 
+                alt="Safrat Logo" 
+                className="h-16 md:h-16 mr-2" 
+              />
             </div>
           </Link>
         </div>
@@ -58,6 +60,9 @@ export default function Header() {
           </Link>
           <Link href="/cars" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo' : ''}`}>
             {t("Cars", "سيارات")}
+          </Link>
+          <Link href="/currency-converter" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo' : ''}`}>
+            {t("Currency", "العملات")}
           </Link>
           <Link href="/" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo' : ''}`}>
             {t("Deals", "عروض")}
@@ -117,6 +122,9 @@ export default function Header() {
             </Link>
             <Link href="/cars" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo' : ''}`}>
               {t("Cars", "سيارات")}
+            </Link>
+            <Link href="/currency-converter" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo' : ''}`}>
+              {t("Currency", "العملات")}
             </Link>
             <Link href="/" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo' : ''}`}>
               {t("Deals", "عروض")}
