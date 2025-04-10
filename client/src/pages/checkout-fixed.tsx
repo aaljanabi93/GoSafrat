@@ -519,34 +519,75 @@ export default function Checkout() {
             
             {/* Booking Summary Card - At the top */}
             <div className="mb-8">
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className={`text-xl font-semibold mb-4 ${language === 'ar' ? 'font-cairo' : ''}`}>
+              <Card className="overflow-hidden border-2 border-[#051C2C] shadow-lg">
+                <div className="bg-gradient-to-r from-[#051C2C] to-[#0A3A5C] p-4">
+                  <h3 className={`text-xl font-bold text-white ${language === 'ar' ? 'font-cairo' : ''}`}>
                     {t("Booking Summary", "ملخص الحجز")}
                   </h3>
-                  
+                </div>
+                
+                <CardContent className="p-6 bg-white">
                   {bookingDetails && (
                     <>
-                      <div className="flex justify-between items-center mb-4">
-                        <p className={`font-medium text-gray-700 ${language === 'ar' ? 'font-cairo' : ''}`}>
-                          {bookingDetails.title}
-                        </p>
+                      <div className="flex justify-between items-center mb-6">
+                        <div>
+                          <p className={`text-lg font-bold text-[#051C2C] ${language === 'ar' ? 'font-cairo' : ''}`}>
+                            {bookingDetails.title}
+                          </p>
+                          {currentBooking.type === "flight" && currentBooking.flightNumber && (
+                            <p className="text-sm text-gray-600 mt-1">
+                              {t("Flight", "رحلة")}: {currentBooking.flightNumber}
+                            </p>
+                          )}
+                        </div>
                         {bookingDetails.airlineLogo && (
                           <img 
                             src={bookingDetails.airlineLogo} 
                             alt="Airline Logo" 
-                            className="h-8 w-auto object-contain"
+                            className="h-12 w-auto object-contain"
                           />
                         )}
                       </div>
                       
-                      <div className="space-y-2 mb-4">
+                      {/* Flight-specific visual summary */}
+                      {currentBooking.type === "flight" && (
+                        <div className="mb-6 bg-[#F8F9FA] p-4 rounded-lg border border-gray-200">
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="text-center">
+                              <p className="text-2xl font-bold text-[#051C2C]">
+                                {new Date(currentBooking.departureTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                              </p>
+                              <p className="text-sm font-medium">{currentBooking.departureAirport}</p>
+                            </div>
+                            
+                            <div className="flex-1 mx-4 relative px-2">
+                              <div className="h-0.5 bg-gray-300 w-full absolute top-4"></div>
+                              <div className="w-6 h-6 rounded-full bg-white border-2 border-[#051C2C] absolute top-1 left-0 -ml-3"></div>
+                              <div className="w-6 h-6 rounded-full bg-white border-2 border-[#051C2C] absolute top-1 right-0 -mr-3"></div>
+                              <div className="text-xs text-center mt-6 text-gray-600">{currentBooking.duration || t("Direct Flight", "رحلة مباشرة")}</div>
+                            </div>
+                            
+                            <div className="text-center">
+                              <p className="text-2xl font-bold text-[#051C2C]">
+                                {new Date(currentBooking.arrivalTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                              </p>
+                              <p className="text-sm font-medium">{currentBooking.arrivalAirport}</p>
+                            </div>
+                          </div>
+                          <div className="flex justify-between text-xs text-gray-500 mt-1">
+                            <div>{currentBooking.departureCity}</div>
+                            <div>{currentBooking.arrivalCity}</div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="space-y-3 mb-6">
                         {bookingDetails.details.map((detail, index) => (
-                          <div key={index} className="flex justify-between">
-                            <span className={`text-sm text-gray-600 ${language === 'ar' ? 'font-cairo' : ''}`}>
-                              {detail.label}:
+                          <div key={index} className="grid grid-cols-2 gap-2 pb-2 border-b border-gray-100 last:border-0">
+                            <span className={`text-sm font-semibold text-gray-700 ${language === 'ar' ? 'font-cairo' : ''}`}>
+                              {detail.label}
                             </span>
-                            <span className={`text-sm font-medium text-right ml-2 ${language === 'ar' ? 'font-cairo mr-2 ml-0' : ''}`}>
+                            <span className={`text-sm font-medium text-[#051C2C] ${language === 'ar' ? 'font-cairo text-right' : 'text-right'}`}>
                               {typeof detail.value === 'object' ? 
                                 ('name' in detail.value ? detail.value.name : JSON.stringify(detail.value)) 
                                 : detail.value}
@@ -555,18 +596,19 @@ export default function Checkout() {
                         ))}
                       </div>
                       
-                      <Separator className="my-4" />
-                      
-                      <div className="flex justify-between font-medium">
-                        <span className={language === 'ar' ? 'font-cairo' : ''}>
-                          {t("Total", "المجموع")}:
-                        </span>
-                        <span className="text-primary font-bold">{formatPrice(currentBooking.price)}</span>
+                      <div className="bg-[#F8F9FA] p-4 rounded-lg border border-gray-200">
+                        <div className="flex justify-between items-center">
+                          <span className={`text-lg font-bold text-gray-700 ${language === 'ar' ? 'font-cairo' : ''}`}>
+                            {t("Total Price", "السعر الإجمالي")}
+                          </span>
+                          <span className={`text-2xl font-extrabold text-[#FF6B6B] ${language === 'ar' ? 'font-cairo' : ''}`}>
+                            {formatPrice(currentBooking.price)}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1 text-right">
+                          {t("Including all taxes and fees", "شامل جميع الضرائب والرسوم")}
+                        </p>
                       </div>
-                      
-                      <p className={`text-xs text-gray-500 mt-2 ${language === 'ar' ? 'font-cairo' : ''}`}>
-                        {t("Including taxes and fees", "شامل الضرائب والرسوم")}
-                      </p>
                     </>
                   )}
                 </CardContent>
