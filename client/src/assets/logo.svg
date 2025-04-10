@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main circle -->
+  <path d="M250 500C388.071 500 500 388.071 500 250C500 111.929 388.071 0 250 0C111.929 0 0 111.929 0 250C0 388.071 111.929 500 250 500Z" fill="#E94A66"/>
+  
+  <!-- "Safrat" text -->
+  <path d="M150 300C150 300 165 285 195 285C225 285 240 300 240 300C240 300 255 315 285 315C315 315 330 300 330 300M150 330C150 330 165 315 195 315C225 315 240 330 240 330C240 330 255 345 285 345C315 345 330 330 330 330" stroke="white" stroke-width="15" stroke-linecap="round"/>
+  <text x="160" y="275" font-family="Arial" font-size="100" font-weight="bold" fill="white">Safrat</text>
+  
+  <!-- Small plane icon in top left -->
+  <circle cx="85" cy="85" r="65" fill="#E94A66"/>
+  <path d="M60 85L85 60L110 85L85 110L60 85Z" fill="none" stroke="white" stroke-width="3"/>
+  <path d="M65 85H105" stroke="white" stroke-width="3"/>
+  <path d="M85 65V105" stroke="white" stroke-width="3"/>
+  <path d="M50 85H120" stroke="white" stroke-width="3"/>
+  
+  <!-- Small luggage icon in bottom right -->
+  <circle cx="415" cy="415" r="45" fill="#E94A66"/>
+  <rect x="395" y="395" width="30" height="30" rx="2" stroke="white" stroke-width="3" fill="none"/>
+  <path d="M410 385V395" stroke="white" stroke-width="3"/>
+  <path d="M405 435H430" stroke="white" stroke-width="3"/>
+  <path d="M415 425V435" stroke="white" stroke-width="3"/>
+</svg>
