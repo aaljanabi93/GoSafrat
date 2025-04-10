@@ -6,121 +6,8 @@ import axios from "axios";
 import { z } from "zod";
 import { insertFlightBookingSchema, insertHotelBookingSchema, insertCarRentalSchema, insertPaymentSchema } from "@shared/schema";
 
-// Define common airlines with detailed information
-const airlines = {
-  "RJ": { 
-    name: "Royal Jordanian", 
-    code: "RJ",
-    logo: "https://upload.wikimedia.org/wikipedia/en/thumb/c/cb/Royal_Jordanian_Airlines_logo.svg/1200px-Royal_Jordanian_Airlines_logo.svg.png",
-    aircraft: ["Boeing 787", "Airbus A320"],
-    alliance: "Oneworld"
-  },
-  "EK": { 
-    name: "Emirates", 
-    code: "EK",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/d/d0/Emirates_logo.svg",
-    aircraft: ["Airbus A380", "Boeing 777"],
-    alliance: "None"
-  },
-  "QR": { 
-    name: "Qatar Airways", 
-    code: "QR",
-    logo: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f4/Qatar_Airways_Logo.svg/1200px-Qatar_Airways_Logo.svg.png",
-    aircraft: ["Airbus A350", "Boeing 787"],
-    alliance: "Oneworld"
-  },
-  "TK": { 
-    name: "Turkish Airlines", 
-    code: "TK",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/5/5c/Turkish_Airlines_logo.svg",
-    aircraft: ["Boeing 777", "Airbus A330"],
-    alliance: "Star Alliance"
-  },
-  "EY": { 
-    name: "Etihad Airways", 
-    code: "EY",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/9/9b/Etihad_Airways_logo.svg",
-    aircraft: ["Boeing 787", "Airbus A380"],
-    alliance: "None"
-  },
-  "GF": { 
-    name: "Gulf Air", 
-    code: "GF",
-    logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Gulf_Air_logo.svg",
-    aircraft: ["Boeing 787", "Airbus A320"],
-    alliance: "None"
-  },
-  "MS": { 
-    name: "EgyptAir", 
-    code: "MS",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/b/b0/EgyptAir_logo.svg",
-    aircraft: ["Boeing 787", "Airbus A320"],
-    alliance: "Star Alliance"
-  },
-  "LH": { 
-    name: "Lufthansa", 
-    code: "LH",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/8/84/Lufthansa_Logo_2018.svg",
-    aircraft: ["Boeing 747", "Airbus A380"],
-    alliance: "Star Alliance"
-  },
-  "BA": { 
-    name: "British Airways", 
-    code: "BA",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/6/69/British_Airways_Logo.svg",
-    aircraft: ["Boeing 777", "Airbus A320"],
-    alliance: "Oneworld"
-  },
-  "AF": { 
-    name: "Air France", 
-    code: "AF",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/Air_France_Logo.svg",
-    aircraft: ["Boeing 777", "Airbus A350"],
-    alliance: "SkyTeam"
-  },
-  "SV": { 
-    name: "Saudia", 
-    code: "SV",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/6/65/Saudia_Logo.svg",
-    aircraft: ["Boeing 787", "Airbus A320"],
-    alliance: "SkyTeam"
-  },
-  "KU": { 
-    name: "Kuwait Airways", 
-    code: "KU",
-    logo: "https://upload.wikimedia.org/wikipedia/en/5/5c/Kuwait_Airways_Logo.svg",
-    aircraft: ["Boeing 777", "Airbus A330"],
-    alliance: "None"
-  },
-  "OA": { 
-    name: "Olympic Air", 
-    code: "OA",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/0/07/Olympic_Air_logo.svg",
-    aircraft: ["Bombardier Dash 8"],
-    alliance: "None"
-  },
-  "WY": { 
-    name: "Oman Air", 
-    code: "WY",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/d/d1/Oman_Air_Logo.svg",
-    aircraft: ["Boeing 787", "Airbus A330"],
-    alliance: "None"
-  },
-  "G9": { 
-    name: "Air Arabia", 
-    code: "G9",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/3/37/Air_Arabia_Logo.svg",
-    aircraft: ["Airbus A320"],
-    alliance: "None"
-  },
-  "FZ": { 
-    name: "Flydubai", 
-    code: "FZ",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/8/81/FlyDubai_logo.svg",
-    aircraft: ["Boeing 737"],
-    alliance: "None"
-  }
-};
+// Import airline data from the dedicated file
+import { airlines, getAirlineCodes } from "../client/src/lib/airlines-data";
 
 // Check for required environment variables
 if (!process.env.TRAVELPAYOUTS_MARKER || !process.env.TRAVELPAYOUTS_API_TOKEN) {
@@ -233,7 +120,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Generate more realistic flight options (10-15 flights)
         // Use all airlines from our comprehensive airlines object
-        const airlineCodes = Object.keys(airlines);
+        const airlineCodes = getAirlineCodes();
         const mockFlights: Record<string, any> = {};
         
         const numFlights = Math.floor(Math.random() * 6) + 10; // 10-15 flights
