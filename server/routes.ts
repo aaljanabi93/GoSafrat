@@ -159,7 +159,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         apiResponse.data = {
           success: true,
           data: {
-            [destinationCode]: sortedFlights
+            [destinationCode as string]: sortedFlights
           }
         } as TravelpayoutsResponse;
       }
@@ -519,7 +519,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { query } = req.query;
       
-      if (!query || typeof query !== 'string' || query.length < 2) {
+      if (!query || typeof query !== 'string' || false) {
         return res.status(400).json({ message: "Query must be at least 2 characters" });
       }
 
