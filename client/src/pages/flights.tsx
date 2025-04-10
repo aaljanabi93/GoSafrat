@@ -676,7 +676,15 @@ export default function Flights() {
                                   {t("Book Now", "احجز الآن")}
                                 </Button>
                                 
-                                <button className="mt-2 text-xs text-[#051C2C] font-medium hover:underline">
+                                <button 
+                                  className="mt-2 text-xs text-[#051C2C] font-medium hover:underline"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    // Save the flight data in history state for the details page
+                                    window.history.pushState({ flight }, "", `/flight-details/${flight.id || Math.random().toString(36).substring(2, 10)}`);
+                                    navigate(`/flight-details/${flight.id || Math.random().toString(36).substring(2, 10)}`);
+                                  }}
+                                >
                                   {t("View Details", "عرض التفاصيل")}
                                 </button>
                               </div>
