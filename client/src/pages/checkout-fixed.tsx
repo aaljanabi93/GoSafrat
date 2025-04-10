@@ -355,7 +355,8 @@ export default function Checkout() {
         {
           label: t("Departure", "المغادرة"),
           value: currentBooking.departureTime && !isNaN(new Date(currentBooking.departureTime).getTime()) 
-            ? format(new Date(currentBooking.departureTime), "PPP") 
+            ? format(new Date(currentBooking.departureTime), "EEE, MMM d, yyyy") + " at " + 
+              new Date(currentBooking.departureTime).toLocaleTimeString([], {hour: 'numeric', minute:'2-digit', hour12: true})
             : (typeof currentBooking.departureTime === 'string' ? currentBooking.departureTime : "-")
         },
         {
@@ -434,13 +435,13 @@ export default function Checkout() {
           {
             label: t("Check-in", "تسجيل الوصول"),
             value: currentBooking.checkInDate && !isNaN(new Date(currentBooking.checkInDate).getTime()) 
-              ? format(new Date(currentBooking.checkInDate), "PPP") 
+              ? format(new Date(currentBooking.checkInDate), "EEE, MMM d, yyyy")
               : (typeof currentBooking.checkInDate === 'string' ? currentBooking.checkInDate : "-")
           },
           {
             label: t("Check-out", "تسجيل المغادرة"),
             value: currentBooking.checkOutDate && !isNaN(new Date(currentBooking.checkOutDate).getTime()) 
-              ? format(new Date(currentBooking.checkOutDate), "PPP") 
+              ? format(new Date(currentBooking.checkOutDate), "EEE, MMM d, yyyy")
               : (typeof currentBooking.checkOutDate === 'string' ? currentBooking.checkOutDate : "-")
           },
           {
@@ -468,8 +469,8 @@ export default function Checkout() {
           {
             label: t("Pickup Date", "تاريخ الاستلام"),
             value: currentBooking.pickupDate && !isNaN(new Date(currentBooking.pickupDate).getTime()) 
-              ? `${format(new Date(currentBooking.pickupDate), "PPP")} ${currentBooking.pickupTime || ""}` 
-              : (typeof currentBooking.pickupDate === 'string' ? `${currentBooking.pickupDate} ${currentBooking.pickupTime || ""}` : "-")
+              ? `${format(new Date(currentBooking.pickupDate), "EEE, MMM d, yyyy")}${currentBooking.pickupTime ? ` at ${currentBooking.pickupTime}` : ""}` 
+              : (typeof currentBooking.pickupDate === 'string' ? `${currentBooking.pickupDate}${currentBooking.pickupTime ? ` at ${currentBooking.pickupTime}` : ""}` : "-")
           },
           {
             label: t("Drop-off Location", "موقع التسليم"),
@@ -478,8 +479,8 @@ export default function Checkout() {
           {
             label: t("Drop-off Date", "تاريخ التسليم"),
             value: currentBooking.dropoffDate && !isNaN(new Date(currentBooking.dropoffDate).getTime()) 
-              ? `${format(new Date(currentBooking.dropoffDate), "PPP")} ${currentBooking.dropoffTime || ""}` 
-              : (typeof currentBooking.dropoffDate === 'string' ? `${currentBooking.dropoffDate} ${currentBooking.dropoffTime || ""}` : "-")
+              ? `${format(new Date(currentBooking.dropoffDate), "EEE, MMM d, yyyy")}${currentBooking.dropoffTime ? ` at ${currentBooking.dropoffTime}` : ""}` 
+              : (typeof currentBooking.dropoffDate === 'string' ? `${currentBooking.dropoffDate}${currentBooking.dropoffTime ? ` at ${currentBooking.dropoffTime}` : ""}` : "-")
           }
         ]
       };
@@ -555,7 +556,7 @@ export default function Checkout() {
                           <div className="flex items-center justify-between mb-1">
                             <div className="text-center">
                               <p className="text-2xl font-bold text-[#051C2C]">
-                                {new Date(currentBooking.departureTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                {new Date(currentBooking.departureTime).toLocaleTimeString([], {hour: 'numeric', minute:'2-digit', hour12: true})}
                               </p>
                               <p className="text-sm font-medium">{currentBooking.departureAirport}</p>
                             </div>
@@ -569,7 +570,7 @@ export default function Checkout() {
                             
                             <div className="text-center">
                               <p className="text-2xl font-bold text-[#051C2C]">
-                                {new Date(currentBooking.arrivalTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                {new Date(currentBooking.arrivalTime).toLocaleTimeString([], {hour: 'numeric', minute:'2-digit', hour12: true})}
                               </p>
                               <p className="text-sm font-medium">{currentBooking.arrivalAirport}</p>
                             </div>
