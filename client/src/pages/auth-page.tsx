@@ -58,11 +58,6 @@ export default function AuthPage() {
     }
   }, [location]);
 
-  // If user is already logged in, redirect to home
-  if (user) {
-    return <Redirect to="/" />;
-  }
-
   // Login form handling
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -97,6 +92,11 @@ export default function AuthPage() {
     const { confirmPassword, ...userData } = values;
     registerMutation.mutate(userData);
   };
+
+  // If user is already logged in, redirect to home
+  if (user) {
+    return <Redirect to="/" />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white flex flex-col md:flex-row">
