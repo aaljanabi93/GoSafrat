@@ -12,6 +12,11 @@ export const users = pgTable("users", {
   lastName: text("last_name"),
   phoneNumber: text("phone_number"),
   stripeCustomerId: text("stripe_customer_id"),
+  emailVerified: boolean("email_verified").default(false),
+  verificationToken: text("verification_token"),
+  verificationExpires: timestamp("verification_expires"),
+  resetToken: text("reset_token"),
+  resetExpires: timestamp("reset_expires"),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
