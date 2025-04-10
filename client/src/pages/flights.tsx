@@ -306,7 +306,7 @@ export default function Flights() {
                         
                         {/* Price & Book */}
                         <div className="w-full md:w-auto mt-4 md:mt-0 flex flex-col items-end">
-                          <div className="text-lg font-semibold text-primary">${flight.price}</div>
+                          <div className="text-lg font-semibold text-primary">{formatPrice(flight.price)}</div>
                           <div className={`text-xs text-gray-500 ${language === 'ar' ? 'font-cairo' : ''}`}>
                             {t("per person", "للشخص الواحد")}
                           </div>

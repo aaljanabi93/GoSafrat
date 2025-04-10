@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { useLanguage } from "@/context/language-context";
 import LanguageToggle from "@/components/ui/language-toggle";
+import CurrencySelector from "@/components/ui/currency-selector";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,9 +67,8 @@ export default function Header() {
         {/* Controls */}
         <div className="flex items-center space-x-4">
           {/* Currency Selector */}
-          <div className="hidden sm:flex items-center space-x-1 text-sm">
-            <span className="font-medium">USD</span>
-            <ChevronDown className="h-4 w-4" />
+          <div className="hidden sm:block">
+            <CurrencySelector />
           </div>
           
           {/* Language Toggle */}
