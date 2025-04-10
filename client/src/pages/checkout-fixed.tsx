@@ -550,29 +550,46 @@ export default function Checkout() {
                         )}
                       </div>
                       
-                      {/* Flight-specific visual summary - Simplified */}
+                      {/* Flight-specific visual summary - Dots with error handling */}
                       {currentBooking.type === "flight" && (
-                        <div className="mb-6 bg-[#F8F9FA] p-4 rounded-lg border border-gray-200">
-                          <div className="flex flex-col space-y-4">
-                            {/* Duration and Stops */}
-                            <div className="bg-white p-3 rounded-md border border-gray-100 text-center">
-                              <span className="text-lg font-bold text-[#051C2C]">
+                        <div className="mb-6 bg-[#F8F9FA] p-5 rounded-lg border border-gray-200">
+                          {/* Airline Logo and Name */}
+                          <div className="flex items-center mb-4">
+                            {bookingDetails && bookingDetails.airlineLogo ? (
+                              <img 
+                                src={bookingDetails.airlineLogo} 
+                                alt={typeof currentBooking.airline === 'string' ? currentBooking.airline : 'Airline'} 
+                                className="h-8 w-auto object-contain mr-3"
+                              />
+                            ) : (
+                              <div className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                                <span className="text-xs font-medium text-gray-600">
+                                  {typeof currentBooking.airline === 'string' ? currentBooking.airline?.substring(0, 2).toUpperCase() : "AL"}
+                                </span>
+                              </div>
+                            )}
+                            <div>
+                              <p className="text-sm font-medium text-gray-700">
+                                {typeof currentBooking.airline === 'string' ? currentBooking.airline : 
+                                 (typeof currentBooking.airline === 'object' && currentBooking.airline && 'name' in currentBooking.airline) 
+                                 ? currentBooking.airline.name : t("Airline", "شركة الطيران")}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {currentBooking.flightNumber || ""}
+                              </p>
+                            </div>
+                            <div className="ml-auto text-right">
+                              <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
                                 {currentBooking.duration || t("Flight Duration", "مدة الرحلة")}
                               </span>
-                              <div className="text-sm text-gray-600 mt-1">
-                                {currentBooking.stops && currentBooking.stops.length > 0 
-                                  ? t(`${currentBooking.stops.length} Stop(s)`, `${currentBooking.stops.length} توقف`) 
-                                  : t("Direct Flight", "رحلة مباشرة")}
-                              </div>
                             </div>
-                            
-                            {/* Departure & Arrival */}
-                            <div className="grid grid-cols-2 gap-4">
+                          </div>
+                          
+                          {/* Flight Path Visualization with Dots */}
+                          <div className="relative my-8">
+                            <div className="flex items-center justify-between">
                               {/* Departure */}
-                              <div className="bg-white p-3 rounded-md border border-gray-100">
-                                <div className="text-sm font-medium text-gray-500 mb-1">
-                                  {t("Departure", "المغادرة")}
-                                </div>
+                              <div className="text-center w-1/3">
                                 <div className="text-lg font-bold text-[#051C2C]">
                                   {currentBooking.departureTime 
                                     ? (isNaN(new Date(currentBooking.departureTime).getTime())
@@ -581,19 +598,46 @@ export default function Checkout() {
                                     : t("Time TBD", "الوقت لاحقاً")
                                   }
                                 </div>
-                                <div className="text-sm text-gray-700 mt-1">
-                                  {currentBooking.departureCity && currentBooking.departureAirport
-                                    ? `${currentBooking.departureCity} (${currentBooking.departureAirport})`
-                                    : currentBooking.departureAirport || currentBooking.departureCity || t("Departure Airport", "مطار المغادرة")
-                                  }
+                                <div className="text-sm font-medium text-gray-700 mt-1">
+                                  {currentBooking.departureAirport}
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  {currentBooking.departureCity}
+                                </div>
+                              </div>
+                              
+                              {/* Flight Path */}
+                              <div className="flex-grow relative mx-2">
+                                <div className="h-0.5 bg-gray-300 w-full absolute top-4"></div>
+                                
+                                {/* Dots and stops */}
+                                <div className="flex justify-between absolute w-full top-4 -translate-y-1/2">
+                                  {/* Departure dot */}
+                                  <div className="w-3 h-3 rounded-full bg-[#051C2C] z-10"></div>
+                                  
+                                  {/* Stops if any */}
+                                  {currentBooking.stops && currentBooking.stops.length > 0 ? (
+                                    currentBooking.stops.map((stop: any, index: number) => (
+                                      <div key={index} className="flex flex-col items-center">
+                                        <div className="w-3 h-3 rounded-full bg-[#FF6B6B] z-10"></div>
+                                        <span className="text-xs text-gray-500 mt-3">
+                                          {stop.airport}
+                                        </span>
+                                      </div>
+                                    ))
+                                  ) : (
+                                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs text-gray-500 whitespace-nowrap">
+                                      {t("Direct", "مباشر")}
+                                    </div>
+                                  )}
+                                  
+                                  {/* Arrival dot */}
+                                  <div className="w-3 h-3 rounded-full bg-[#051C2C] z-10"></div>
                                 </div>
                               </div>
                               
                               {/* Arrival */}
-                              <div className="bg-white p-3 rounded-md border border-gray-100">
-                                <div className="text-sm font-medium text-gray-500 mb-1">
-                                  {t("Arrival", "الوصول")}
-                                </div>
+                              <div className="text-center w-1/3">
                                 <div className="text-lg font-bold text-[#051C2C]">
                                   {currentBooking.arrivalTime 
                                     ? (isNaN(new Date(currentBooking.arrivalTime).getTime())
@@ -602,11 +646,11 @@ export default function Checkout() {
                                     : t("Time TBD", "الوقت لاحقاً")
                                   }
                                 </div>
-                                <div className="text-sm text-gray-700 mt-1">
-                                  {currentBooking.arrivalCity && currentBooking.arrivalAirport
-                                    ? `${currentBooking.arrivalCity} (${currentBooking.arrivalAirport})`
-                                    : currentBooking.arrivalAirport || currentBooking.arrivalCity || t("Arrival Airport", "مطار الوصول")
-                                  }
+                                <div className="text-sm font-medium text-gray-700 mt-1">
+                                  {currentBooking.arrivalAirport}
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  {currentBooking.arrivalCity}
                                 </div>
                               </div>
                             </div>
