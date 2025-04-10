@@ -295,7 +295,7 @@ export default function Checkout() {
     
     setIsLoading(true);
     try {
-      let bookingType;
+      let bookingType: 'flight' | 'hotel' | 'car';
       let bookingId = 1; // Mock ID since we're using memory storage
       
       if (currentBooking.type === "flight") {
@@ -404,12 +404,17 @@ export default function Checkout() {
       return {
         title: t("Flight Booking", "حجز رحلة طيران"),
         details: details,
-        airlineLogo: currentBooking.airline === "Emirates" 
+        // Use the logo from the airline object if available
+        airlineLogo: currentBooking.airline && typeof currentBooking.airline === 'object' && currentBooking.airline.logo 
+          ? currentBooking.airline.logo
+          : currentBooking.airline === "Emirates" || currentBooking.airline === "EK"
           ? "https://upload.wikimedia.org/wikipedia/commons/d/d0/Emirates_logo.svg"
-          : currentBooking.airline === "British Airways"
+          : currentBooking.airline === "British Airways" || currentBooking.airline === "BA"
           ? "https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/British_Airways_Logo.svg/250px-British_Airways_Logo.svg.png"
-          : currentBooking.airline === "Qatar Airways"
+          : currentBooking.airline === "Qatar Airways" || currentBooking.airline === "QR"
           ? "https://upload.wikimedia.org/wikipedia/en/thumb/f/f4/Qatar_Airways_Logo.svg/1200px-Qatar_Airways_Logo.svg.png"
+          : currentBooking.airline === "Royal Jordanian" || currentBooking.airline === "RJ"
+          ? "https://upload.wikimedia.org/wikipedia/en/thumb/c/cb/Royal_Jordanian_Airlines_logo.svg/1200px-Royal_Jordanian_Airlines_logo.svg.png"
           : null
       };
     } else if (currentBooking.type === "hotel") {
