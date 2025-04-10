@@ -254,21 +254,21 @@ export default function FlightSearch() {
         >
           <div className="flex items-center space-x-2 rtl:space-x-reverse">
             <RadioGroupItem value="roundtrip" id="roundtrip" />
-            <Label htmlFor="roundtrip" className={language === 'ar' ? 'font-cairo' : ''}>
+            <Label htmlFor="roundtrip" className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
               {t("Round Trip", "ذهاب وعودة")}
             </Label>
           </div>
           
           <div className="flex items-center space-x-2 rtl:space-x-reverse">
             <RadioGroupItem value="oneway" id="oneway" />
-            <Label htmlFor="oneway" className={language === 'ar' ? 'font-cairo' : ''}>
+            <Label htmlFor="oneway" className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
               {t("One Way", "ذهاب فقط")}
             </Label>
           </div>
           
           <div className="flex items-center space-x-2 rtl:space-x-reverse">
             <RadioGroupItem value="multicity" id="multicity" />
-            <Label htmlFor="multicity" className={language === 'ar' ? 'font-cairo' : ''}>
+            <Label htmlFor="multicity" className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
               {t("Multi-City", "وجهات متعددة")}
             </Label>
           </div>
@@ -378,9 +378,9 @@ export default function FlightSearch() {
                 >
                   <CalendarIcon className="h-4 w-4 absolute left-3 text-gray-400" />
                   {departureDate ? (
-                    format(departureDate, "PPP")
+                    <span className="text-black">{format(departureDate, "PPP")}</span>
                   ) : (
-                    <span className={language === 'ar' ? 'font-cairo' : ''}>
+                    <span className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
                       {t("Departure Date", "تاريخ المغادرة")}
                     </span>
                   )}
@@ -413,9 +413,9 @@ export default function FlightSearch() {
                 >
                   <CalendarIcon className="h-4 w-4 absolute left-3 text-gray-400" />
                   {returnDate ? (
-                    format(returnDate, "PPP")
+                    <span className="text-black">{format(returnDate, "PPP")}</span>
                   ) : (
-                    <span className={language === 'ar' ? 'font-cairo' : ''}>
+                    <span className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
                       {t("Return Date", "تاريخ العودة")}
                     </span>
                   )}
@@ -446,7 +446,7 @@ export default function FlightSearch() {
                 className="w-full pl-10 justify-start text-left font-normal"
               >
                 <User className="h-4 w-4 absolute left-3 text-gray-400" />
-                <span className={language === 'ar' ? 'font-cairo' : ''}>
+                <span className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
                   {passengerCount} {t("Adult", "بالغ")}, {cabinOptions.find(o => o.value === cabinClass)?.label}
                 </span>
                 <ChevronDown className="h-4 w-4 absolute right-3 text-gray-400" />
@@ -456,7 +456,7 @@ export default function FlightSearch() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <Label className={language === 'ar' ? 'font-cairo' : ''}>
+                    <Label className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
                       {t("Adults", "البالغين")}
                     </Label>
                     <div className="flex items-center space-x-2">
@@ -480,14 +480,14 @@ export default function FlightSearch() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label className={language === 'ar' ? 'font-cairo' : ''}>
+                  <Label className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
                     {t("Cabin Class", "درجة المقصورة")}
                   </Label>
                   <RadioGroup value={cabinClass} onValueChange={setCabinClass}>
                     {cabinOptions.map((option) => (
                       <div className="flex items-center space-x-2 rtl:space-x-reverse" key={option.value}>
                         <RadioGroupItem value={option.value} id={`cabin-${option.value}`} />
-                        <Label htmlFor={`cabin-${option.value}`} className={language === 'ar' ? 'font-cairo' : ''}>
+                        <Label htmlFor={`cabin-${option.value}`} className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
                           {option.label}
                         </Label>
                       </div>
