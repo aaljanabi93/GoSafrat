@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/context/language-context";
-import { useBooking } from "@/context/booking-context";
+import { useBooking, AirlineInfo } from "@/context/booking-context";
 import { useCurrency } from "@/context/currency-context";
 import { useLocation } from "wouter";
 import Header from "@/components/layout/header";
@@ -338,7 +338,9 @@ export default function Checkout() {
       const details = [
         {
           label: t("Flight", "الرحلة"),
-          value: currentBooking.airline || t("Selected Flight", "الرحلة المحددة")
+          value: typeof currentBooking.airline === 'object' && currentBooking.airline && 'name' in (currentBooking.airline as object) 
+            ? (currentBooking.airline as any).name 
+            : currentBooking.airline || t("Selected Flight", "الرحلة المحددة")
         },
         {
           label: t("Flight Number", "رقم الرحلة"),
@@ -405,8 +407,10 @@ export default function Checkout() {
         title: t("Flight Booking", "حجز رحلة طيران"),
         details: details,
         // Use the logo from the airline object if available
-        airlineLogo: currentBooking.airline && typeof currentBooking.airline === 'object' && currentBooking.airline.logo 
-          ? currentBooking.airline.logo
+        airlineLogo: currentBooking.airline && 
+          typeof currentBooking.airline === 'object' && 
+          'logo' in (currentBooking.airline as object)
+          ? (currentBooking.airline as AirlineInfo).logo
           : currentBooking.airline === "Emirates" || currentBooking.airline === "EK"
           ? "https://upload.wikimedia.org/wikipedia/commons/d/d0/Emirates_logo.svg"
           : currentBooking.airline === "British Airways" || currentBooking.airline === "BA"
@@ -545,7 +549,9 @@ export default function Checkout() {
                               {detail.label}:
                             </span>
                             <span className={`text-sm font-medium text-right ml-2 ${language === 'ar' ? 'font-cairo mr-2 ml-0' : ''}`}>
-                              {detail.value}
+                              {typeof detail.value === 'object' ? 
+                                ('name' in detail.value ? detail.value.name : JSON.stringify(detail.value)) 
+                                : detail.value}
                             </span>
                           </div>
                         ))}

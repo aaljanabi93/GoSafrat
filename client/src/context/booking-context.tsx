@@ -12,6 +12,15 @@ export interface FlightStop {
   duration: string;
 }
 
+export interface AirlineInfo {
+  code: string;
+  name: string;
+  nameAr?: string;
+  logo: string;
+  aircraft?: string[];
+  alliance?: string;
+}
+
 export interface FlightBookingData {
   type: "flight";
   departureCity: string;
@@ -23,7 +32,7 @@ export interface FlightBookingData {
   passengers: number;
   cabinClass: string;
   price: number;
-  airline?: string;
+  airline?: string | AirlineInfo;
   flightNumber?: string;
   returnFlight?: boolean;
   returnDepartureTime?: string;
