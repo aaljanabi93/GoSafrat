@@ -354,7 +354,9 @@ export default function Checkout() {
         },
         {
           label: t("Departure", "المغادرة"),
-          value: format(new Date(currentBooking.departureTime), "PPP")
+          value: currentBooking.departureTime && !isNaN(new Date(currentBooking.departureTime).getTime()) 
+            ? format(new Date(currentBooking.departureTime), "PPP") 
+            : (typeof currentBooking.departureTime === 'string' ? currentBooking.departureTime : "-")
         },
         {
           label: t("Duration", "المدة"),

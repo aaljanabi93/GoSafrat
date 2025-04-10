@@ -354,7 +354,9 @@ export default function Checkout() {
         },
         {
           label: t("Departure", "المغادرة"),
-          value: currentBooking.departureTime ? format(new Date(currentBooking.departureTime), "PPP") : currentBooking.departureTime || "-"
+          value: currentBooking.departureTime && !isNaN(new Date(currentBooking.departureTime).getTime()) 
+            ? format(new Date(currentBooking.departureTime), "PPP") 
+            : (typeof currentBooking.departureTime === 'string' ? currentBooking.departureTime : "-")
         },
         {
           label: t("Duration", "المدة"),
@@ -428,11 +430,15 @@ export default function Checkout() {
           },
           {
             label: t("Check-in", "تسجيل الوصول"),
-            value: currentBooking.checkInDate ? format(new Date(currentBooking.checkInDate), "PPP") : "-"
+            value: currentBooking.checkInDate && !isNaN(new Date(currentBooking.checkInDate).getTime()) 
+              ? format(new Date(currentBooking.checkInDate), "PPP") 
+              : (typeof currentBooking.checkInDate === 'string' ? currentBooking.checkInDate : "-")
           },
           {
             label: t("Check-out", "تسجيل المغادرة"),
-            value: currentBooking.checkOutDate ? format(new Date(currentBooking.checkOutDate), "PPP") : "-"
+            value: currentBooking.checkOutDate && !isNaN(new Date(currentBooking.checkOutDate).getTime()) 
+              ? format(new Date(currentBooking.checkOutDate), "PPP") 
+              : (typeof currentBooking.checkOutDate === 'string' ? currentBooking.checkOutDate : "-")
           },
           {
             label: t("Rooms", "الغرف"),
@@ -458,8 +464,9 @@ export default function Checkout() {
           },
           {
             label: t("Pickup Date", "تاريخ الاستلام"),
-            value: currentBooking.pickupDate ? 
-              `${format(new Date(currentBooking.pickupDate), "PPP")} ${currentBooking.pickupTime || ""}` : "-"
+            value: currentBooking.pickupDate && !isNaN(new Date(currentBooking.pickupDate).getTime()) 
+              ? `${format(new Date(currentBooking.pickupDate), "PPP")} ${currentBooking.pickupTime || ""}` 
+              : (typeof currentBooking.pickupDate === 'string' ? `${currentBooking.pickupDate} ${currentBooking.pickupTime || ""}` : "-")
           },
           {
             label: t("Drop-off Location", "موقع التسليم"),
@@ -467,8 +474,9 @@ export default function Checkout() {
           },
           {
             label: t("Drop-off Date", "تاريخ التسليم"),
-            value: currentBooking.dropoffDate ? 
-              `${format(new Date(currentBooking.dropoffDate), "PPP")} ${currentBooking.dropoffTime || ""}` : "-"
+            value: currentBooking.dropoffDate && !isNaN(new Date(currentBooking.dropoffDate).getTime()) 
+              ? `${format(new Date(currentBooking.dropoffDate), "PPP")} ${currentBooking.dropoffTime || ""}` 
+              : (typeof currentBooking.dropoffDate === 'string' ? `${currentBooking.dropoffDate} ${currentBooking.dropoffTime || ""}` : "-")
           }
         ]
       };
