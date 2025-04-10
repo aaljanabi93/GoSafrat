@@ -143,8 +143,10 @@ export default function Flights() {
           });
         });
 
-        // Sort the flights
-        sortFlights(processedFlights, sortOption);
+        // Sort and set the flights
+        const sortedFlights = sortFlights(processedFlights, sortOption);
+        setFlights(sortedFlights);
+        setFilteredFlights(sortedFlights);
       } catch (err: any) {
         console.error("Error fetching flights:", err);
         setError(err.message || "Failed to fetch flights");
@@ -424,7 +426,12 @@ export default function Flights() {
             <div className="bg-white p-4 flex flex-wrap justify-between items-center shadow-sm mb-4">
               <div className="flex flex-wrap items-center gap-3">
                 <div className={`text-lg font-bold text-[#051C2C] ${language === 'ar' ? 'font-cairo' : ''}`}>
-                  {flights.length} {t("Flight Options", "خيارات الرحلات")}
+                  {filteredFlights.length} {t("Flight Options", "خيارات الرحلات")}
+                  {filteredFlights.length !== flights.length && (
+                    <span className="text-sm font-normal text-gray-500 ml-2">
+                      ({t("filtered from", "تمت تصفيتها من")} {flights.length})
+                    </span>
+                  )}
                 </div>
                 <div className="flex text-sm border border-gray-200 rounded-lg overflow-hidden">
                   <div className="bg-[#051C2C] text-white px-3 py-1.5">
@@ -447,110 +454,55 @@ export default function Flights() {
             
             {/* Main content with sidebar */}
             <div className="flex flex-col lg:flex-row gap-4">
-              {/* Sidebar with filters */}
-              <div className="lg:w-1/4">
-                <div className="bg-white rounded-md shadow-sm">
-                  {/* Filter header */}
-                  <div className="bg-[#051C2C] text-white px-4 py-3 rounded-t-md">
-                    <h3 className="font-semibold">
+              {/* Sidebar with filters - Desktop */}
+              <div className="lg:w-1/4 hidden lg:block">
+                <SearchFilters
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  onClearFilters={handleClearFilters}
+                  resultsCount={filteredFlights.length}
+                  type="flight"
+                  currency={currency.code}
+                />
+              </div>
+              
+              {/* Mobile Filters */}
+              <div className="lg:hidden w-full mb-4">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" className="w-full flex items-center justify-center gap-2">
+                      <Filter className="h-4 w-4" />
                       {t("Filter Results", "تصفية النتائج")}
-                    </h3>
-                  </div>
-                  
-                  {/* Price Range */}
-                  <div className="p-4 border-b border-gray-200">
-                    <h4 className="font-medium text-sm mb-3">
-                      {t("Price Range", "نطاق السعر")}
-                    </h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-xs text-gray-600">
-                        <span>{formatPrice(300)}</span>
-                        <span>{formatPrice(1000)}</span>
-                      </div>
-                      <div className="h-1 bg-gray-200 rounded-full">
-                        <div className="h-1 bg-[#FF6B6B] rounded-full w-3/4"></div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Airlines */}
-                  <div className="p-4 border-b border-gray-200">
-                    <h4 className="font-medium text-sm mb-3">
-                      {t("Airlines", "شركات الطيران")}
-                    </h4>
-                    <div className="space-y-2">
-                      {["Emirates", "Royal Jordanian", "Qatar Airways", "Turkish Airlines", "Etihad Airways"].map((airline, index) => (
-                        <div key={index} className="flex items-center">
-                          <input 
-                            type="checkbox" 
-                            id={`airline-${index}`} 
-                            className="h-4 w-4 text-[#051C2C] border-gray-300 rounded"
-                          />
-                          <label htmlFor={`airline-${index}`} className="ml-2 text-sm text-gray-600">
-                            {airline}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Flight Times */}
-                  <div className="p-4 border-b border-gray-200">
-                    <h4 className="font-medium text-sm mb-3">
-                      {t("Departure Time", "وقت المغادرة")}
-                    </h4>
-                    <div className="space-y-2">
-                      {[
-                        { label: t("Morning (6:00 - 12:00)", "صباحًا (6:00 - 12:00)"), value: "morning" },
-                        { label: t("Afternoon (12:00 - 18:00)", "بعد الظهر (12:00 - 18:00)"), value: "afternoon" },
-                        { label: t("Evening (18:00 - 24:00)", "مساءً (18:00 - 24:00)"), value: "evening" },
-                        { label: t("Night (0:00 - 6:00)", "ليلًا (0:00 - 6:00)"), value: "night" },
-                      ].map((time, index) => (
-                        <div key={index} className="flex items-center">
-                          <input 
-                            type="checkbox" 
-                            id={`time-${time.value}`} 
-                            className="h-4 w-4 text-[#051C2C] border-gray-300 rounded"
-                          />
-                          <label htmlFor={`time-${time.value}`} className="ml-2 text-sm text-gray-600">
-                            {time.label}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Flight Stops */}
-                  <div className="p-4 border-b border-gray-200">
-                    <h4 className="font-medium text-sm mb-3">
-                      {t("Stops", "التوقفات")}
-                    </h4>
-                    <div className="space-y-2">
-                      {[
-                        { label: t("Direct Flights", "رحلات مباشرة"), value: "direct" },
-                        { label: t("1 Stop", "توقف واحد"), value: "one_stop" },
-                      ].map((stop, index) => (
-                        <div key={index} className="flex items-center">
-                          <input 
-                            type="checkbox" 
-                            id={`stop-${stop.value}`} 
-                            className="h-4 w-4 text-[#051C2C] border-gray-300 rounded"
-                          />
-                          <label htmlFor={`stop-${stop.value}`} className="ml-2 text-sm text-gray-600">
-                            {stop.label}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Apply Filters Button */}
-                  <div className="p-4">
-                    <Button className="w-full bg-[#051C2C] hover:bg-[#0A3A5C]">
-                      {t("Apply Filters", "تطبيق التصفية")}
+                      {Object.keys(filters).some(key => {
+                        if (key === 'priceRange') {
+                          return filters.priceRange.current[0] !== filters.priceRange.min || 
+                                  filters.priceRange.current[1] !== filters.priceRange.max;
+                        }
+                        if (Array.isArray(filters[key as keyof typeof filters])) {
+                          return (filters[key as keyof typeof filters] as any[]).length > 0;
+                        }
+                        if (key === 'onlyRefundable') {
+                          return filters.onlyRefundable;
+                        }
+                        return false;
+                      }) && (
+                        <span className="bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                          •
+                        </span>
+                      )}
                     </Button>
-                  </div>
-                </div>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-[85vw] sm:w-[400px]">
+                    <SearchFilters
+                      filters={filters}
+                      onFilterChange={handleFilterChange}
+                      onClearFilters={handleClearFilters}
+                      resultsCount={filteredFlights.length}
+                      type="flight"
+                      currency={currency.code}
+                    />
+                  </SheetContent>
+                </Sheet>
               </div>
               
               {/* Flight Results */}
@@ -591,7 +543,7 @@ export default function Flights() {
                   </div>
                 ) : (
                   <>
-                    {flights.map((flight) => (
+                    {filteredFlights.map((flight) => (
                       <div 
                         key={flight.id || Math.random().toString()}
                         className="bg-white rounded-md shadow-sm mb-4 overflow-hidden hover:shadow-md transition-shadow"
@@ -751,7 +703,7 @@ export default function Flights() {
                       </div>
                     ))}
                     
-                    {flights.length === 0 && (
+                    {filteredFlights.length === 0 && flights.length > 0 && (
                       <div className="text-center py-8">
                         <div className="text-lg text-gray-500 mb-2">
                           {t("No flights found", "لم يتم العثور على رحلات")}
