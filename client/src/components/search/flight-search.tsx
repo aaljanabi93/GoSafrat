@@ -312,9 +312,7 @@ export default function FlightSearch() {
                   selected={departureDate}
                   onSelect={setDepartureDate}
                   initialFocus
-                  disabled={(date) => {
-                    return date < new Date();
-                  }}
+                  disabled={(date: Date): boolean => date < new Date()}
                 />
               </PopoverContent>
             </Popover>
@@ -349,7 +347,10 @@ export default function FlightSearch() {
                   selected={returnDate}
                   onSelect={setReturnDate}
                   initialFocus
-                  disabled={(date) => date < new Date() || (departureDate && date < departureDate)}
+                  disabled={(date: Date): boolean => {
+                    if (!date) return true;
+                    return date < new Date() || (departureDate ? date < departureDate : false);
+                  }}
                 />
               </PopoverContent>
             </Popover>
