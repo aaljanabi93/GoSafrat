@@ -48,20 +48,20 @@ export default function Header() {
         </div>
         
         {/* Navigation - Desktop */}
-        <nav className={`hidden md:flex items-center ${language === 'ar' ? 'space-x-reverse' : 'space-x-6'} font-medium text-gray-700`}>
-          <Link href="/" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo text-right' : ''}`}>
+        <nav className={`hidden md:flex items-center ${language === 'ar' ? 'gap-8 rtl' : 'space-x-6'} font-medium text-gray-700`}>
+          <Link href="/" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo text-right px-1' : ''}`}>
             {t("Home", "الرئيسية")}
           </Link>
-          <Link href="/flights" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo text-right' : ''}`}>
+          <Link href="/flights" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo text-right px-1' : ''}`}>
             {t("Flights", "رحلات طيران")}
           </Link>
-          <Link href="/hotels" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo text-right' : ''}`}>
+          <Link href="/hotels" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo text-right px-1' : ''}`}>
             {t("Hotels", "فنادق")}
           </Link>
-          <Link href="/cars" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo text-right' : ''}`}>
+          <Link href="/cars" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo text-right px-1' : ''}`}>
             {t("Cars", "سيارات")}
           </Link>
-          <Link href="/" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo text-right' : ''}`}>
+          <Link href="/" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo text-right px-1' : ''}`}>
             {t("Deals", "عروض")}
           </Link>
         </nav>
@@ -107,20 +107,20 @@ export default function Header() {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 py-3">
-          <div className={`container mx-auto px-4 flex flex-col space-y-3 ${language === 'ar' ? 'items-end' : ''}`}>
-            <Link href="/" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo text-right w-full' : ''}`}>
+          <div className={`container mx-auto px-4 flex flex-col ${language === 'ar' ? 'gap-4 items-end rtl' : 'space-y-3'}`}>
+            <Link href="/" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo text-right w-full px-2' : ''}`}>
               {t("Home", "الرئيسية")}
             </Link>
-            <Link href="/flights" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo text-right w-full' : ''}`}>
+            <Link href="/flights" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo text-right w-full px-2' : ''}`}>
               {t("Flights", "رحلات طيران")}
             </Link>
-            <Link href="/hotels" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo text-right w-full' : ''}`}>
+            <Link href="/hotels" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo text-right w-full px-2' : ''}`}>
               {t("Hotels", "فنادق")}
             </Link>
-            <Link href="/cars" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo text-right w-full' : ''}`}>
+            <Link href="/cars" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo text-right w-full px-2' : ''}`}>
               {t("Cars", "سيارات")}
             </Link>
-            <Link href="/" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo text-right w-full' : ''}`}>
+            <Link href="/" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo text-right w-full px-2' : ''}`}>
               {t("Deals", "عروض")}
             </Link>
             
