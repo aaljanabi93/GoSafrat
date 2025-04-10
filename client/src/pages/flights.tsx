@@ -88,20 +88,26 @@ export default function Flights() {
             const apiFlightData = data[destCode][flightNum];
             
             // Create a flight object with our required structure
+            // Preserve the original airport information from currentBooking
+            const departureCity = currentBooking?.type === "flight" ? currentBooking.departureCity : "Dubai";
+            const departureAirport = currentBooking?.type === "flight" ? currentBooking.departureAirport : origin;
+            const arrivalCity = currentBooking?.type === "flight" ? currentBooking.arrivalCity : "Amman";
+            const arrivalAirport = currentBooking?.type === "flight" ? currentBooking.arrivalAirport : destCode;
+            
             processedFlights.push({
               id: `${apiFlightData.airline}${apiFlightData.flight_number}`,
               price: apiFlightData.price,
               airline: apiFlightData.airline || {},
-              departure: apiFlightData.departure || {
-                time: "00:00",
-                airport: origin,
-                city: "Unknown",
+              departure: {
+                time: apiFlightData.departure?.time || "00:00",
+                airport: departureAirport,
+                city: departureCity,
                 date: departDate
               },
-              arrival: apiFlightData.arrival || {
-                time: "00:00",
-                airport: destCode,
-                city: "Unknown",
+              arrival: {
+                time: apiFlightData.arrival?.time || "00:00",
+                airport: arrivalAirport,
+                city: arrivalCity,
                 date: departDate
               },
               duration: apiFlightData.duration || "Unknown",
@@ -235,7 +241,7 @@ export default function Flights() {
                           </span>
                           <ChevronRight className="mx-3 text-gray-400" />
                           <span className="font-medium">
-                            {currentBooking?.type === "flight" ? currentBooking.arrivalCity : "London"} ({currentBooking?.type === "flight" ? currentBooking.arrivalAirport : "LHR"})
+                            {currentBooking?.type === "flight" ? currentBooking.arrivalCity : "Amman"} ({currentBooking?.type === "flight" ? currentBooking.arrivalAirport : "AMM"})
                           </span>
                         </>
                       ) : (
@@ -246,7 +252,7 @@ export default function Flights() {
                           </span>
                           <ChevronLeft className="mx-3 text-gray-400" />
                           <span className="font-medium font-cairo">
-                            {currentBooking?.type === "flight" ? currentBooking.arrivalCity : "لندن"} ({currentBooking?.type === "flight" ? currentBooking.arrivalAirport : "LHR"})
+                            {currentBooking?.type === "flight" ? currentBooking.arrivalCity : "عمان"} ({currentBooking?.type === "flight" ? currentBooking.arrivalAirport : "AMM"})
                           </span>
                         </>
                       )}

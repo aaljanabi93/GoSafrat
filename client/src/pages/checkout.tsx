@@ -183,18 +183,140 @@ const BookingDetailsForm = ({ onContinue }: { onContinue: () => void }) => {
             
             <div>
               <Label htmlFor="nationality" className={language === 'ar' ? 'font-cairo' : ''}>
-                {t("Nationality", "الجنسية")}
+                {t("Nationality", "الجنسية")} *
               </Label>
               <div className="relative">
-                <Input
-                  id="nationality"
-                  name="nationality"
+                <Select 
+                  name="nationality" 
                   value={formData.nationality}
-                  onChange={handleChange}
-                  className={visaRequired !== null ? (visaRequired ? "border-yellow-400" : "border-green-400") : ""}
-                />
+                  onValueChange={(value) => {
+                    setFormData(prev => ({ ...prev, nationality: value }));
+                  }}
+                  required
+                >
+                  <SelectTrigger 
+                    className={visaRequired !== null ? (visaRequired ? "border-yellow-400" : "border-green-400") : ""}
+                  >
+                    <SelectValue placeholder={t("Select Nationality", "اختر الجنسية")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <div className="max-h-80 overflow-y-auto">
+                      {/* Middle East */}
+                      <SelectGroup>
+                        <SelectLabel>{t("Middle East", "الشرق الأوسط")}</SelectLabel>
+                        {nationalities
+                          .filter(n => n.region === "Middle East")
+                          .map(nationality => (
+                            <SelectItem 
+                              key={nationality.code} 
+                              value={nationality.code}
+                            >
+                              {language === 'en' ? nationality.name : nationality.nameAr}
+                            </SelectItem>
+                          ))
+                        }
+                      </SelectGroup>
+                      
+                      {/* Europe */}
+                      <SelectGroup>
+                        <SelectLabel>{t("Europe", "أوروبا")}</SelectLabel>
+                        {nationalities
+                          .filter(n => n.region === "Europe")
+                          .map(nationality => (
+                            <SelectItem 
+                              key={nationality.code} 
+                              value={nationality.code}
+                            >
+                              {language === 'en' ? nationality.name : nationality.nameAr}
+                            </SelectItem>
+                          ))
+                        }
+                      </SelectGroup>
+                      
+                      {/* North America */}
+                      <SelectGroup>
+                        <SelectLabel>{t("North America", "أمريكا الشمالية")}</SelectLabel>
+                        {nationalities
+                          .filter(n => n.region === "North America")
+                          .map(nationality => (
+                            <SelectItem 
+                              key={nationality.code} 
+                              value={nationality.code}
+                            >
+                              {language === 'en' ? nationality.name : nationality.nameAr}
+                            </SelectItem>
+                          ))
+                        }
+                      </SelectGroup>
+                      
+                      {/* Asia */}
+                      <SelectGroup>
+                        <SelectLabel>{t("Asia", "آسيا")}</SelectLabel>
+                        {nationalities
+                          .filter(n => n.region === "Asia")
+                          .map(nationality => (
+                            <SelectItem 
+                              key={nationality.code} 
+                              value={nationality.code}
+                            >
+                              {language === 'en' ? nationality.name : nationality.nameAr}
+                            </SelectItem>
+                          ))
+                        }
+                      </SelectGroup>
+                      
+                      {/* Africa */}
+                      <SelectGroup>
+                        <SelectLabel>{t("Africa", "أفريقيا")}</SelectLabel>
+                        {nationalities
+                          .filter(n => n.region === "Africa")
+                          .map(nationality => (
+                            <SelectItem 
+                              key={nationality.code} 
+                              value={nationality.code}
+                            >
+                              {language === 'en' ? nationality.name : nationality.nameAr}
+                            </SelectItem>
+                          ))
+                        }
+                      </SelectGroup>
+                      
+                      {/* South America */}
+                      <SelectGroup>
+                        <SelectLabel>{t("South America", "أمريكا الجنوبية")}</SelectLabel>
+                        {nationalities
+                          .filter(n => n.region === "South America")
+                          .map(nationality => (
+                            <SelectItem 
+                              key={nationality.code} 
+                              value={nationality.code}
+                            >
+                              {language === 'en' ? nationality.name : nationality.nameAr}
+                            </SelectItem>
+                          ))
+                        }
+                      </SelectGroup>
+                      
+                      {/* Oceania */}
+                      <SelectGroup>
+                        <SelectLabel>{t("Oceania", "أوقيانوسيا")}</SelectLabel>
+                        {nationalities
+                          .filter(n => n.region === "Oceania")
+                          .map(nationality => (
+                            <SelectItem 
+                              key={nationality.code} 
+                              value={nationality.code}
+                            >
+                              {language === 'en' ? nationality.name : nationality.nameAr}
+                            </SelectItem>
+                          ))
+                        }
+                      </SelectGroup>
+                    </div>
+                  </SelectContent>
+                </Select>
                 {checkingVisa && (
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <div className="absolute right-10 top-1/2 -translate-y-1/2">
                     <svg className="animate-spin h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -203,14 +325,36 @@ const BookingDetailsForm = ({ onContinue }: { onContinue: () => void }) => {
                 )}
               </div>
               {visaRequired === true && formData.nationality && (
-                <p className="mt-1 text-yellow-600 text-sm">
-                  {t("Visa may be required for this destination", "قد تكون التأشيرة مطلوبة لهذه الوجهة")}
-                </p>
+                <div className="mt-2 p-3 rounded-md bg-amber-50 border border-amber-200">
+                  <p className="text-amber-600 text-sm flex items-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span>
+                      {t("Visa required for", "تأشيرة مطلوبة لـ")} {currentBooking?.type === "flight" ? currentBooking.arrivalCity : "destination"}
+                      <br/>
+                      <span className="text-xs opacity-80">
+                        {t("Please check visa requirements before travel", "يرجى التحقق من متطلبات التأشيرة قبل السفر")}
+                      </span>
+                    </span>
+                  </p>
+                </div>
               )}
               {visaRequired === false && formData.nationality && (
-                <p className="mt-1 text-green-600 text-sm">
-                  {t("No visa expected for this destination", "لا يتوقع طلب تأشيرة لهذه الوجهة")}
-                </p>
+                <div className="mt-2 p-3 rounded-md bg-green-50 border border-green-200">
+                  <p className="text-green-600 text-sm flex items-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>
+                      {t("No visa required for", "لا تحتاج إلى تأشيرة لـ")} {currentBooking?.type === "flight" ? currentBooking.arrivalCity : "destination"}
+                      <br/>
+                      <span className="text-xs opacity-80">
+                        {t("Travel is possible without visa", "يمكن السفر بدون تأشيرة")}
+                      </span>
+                    </span>
+                  </p>
+                </div>
               )}
             </div>
             
