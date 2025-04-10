@@ -10,6 +10,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { 
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Helmet } from "react-helmet";
 import { format } from "date-fns";
@@ -21,6 +30,11 @@ import {
 } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { api } from "@/lib/api";
+import { 
+  nationalities, 
+  checkVisaRequirement, 
+  getCountryCodeFromAirport 
+} from "@/lib/nationalities-data";
 
 // Initialize Stripe with the public key
 if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
@@ -56,22 +70,14 @@ const BookingDetailsForm = ({ onContinue }: { onContinue: () => void }) => {
     const checkVisaRequirements = async () => {
       setCheckingVisa(true);
       try {
-        // Simulate API call for visa requirements
-        // In a real app, this would call an actual visa requirements API
-        // We're using a timeout to simulate the async nature of an API call
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Get the destination country code from the arrival airport
+        const destinationCode = getCountryCodeFromAirport(currentBooking.arrivalAirport);
         
-        // Destinations that typically require visas for many nationalities
-        const destinationsRequiringVisas = [
-          'United States', 'Canada', 'United Kingdom', 'Australia', 
-          'China', 'Japan', 'Russia', 'Brazil', 'India'
-        ];
+        // Check visa requirement using our nationality database
+        const visaCheck = checkVisaRequirement(formData.nationality, destinationCode);
         
-        // Check if destination is in the list above
-        const destination = currentBooking.arrivalCity;
-        const needsVisa = destinationsRequiringVisas.some(country => 
-          destination.toLowerCase().includes(country.toLowerCase())
-        );
+        // The visa is required if visaCheck.required is true and not on arrival
+        const needsVisa = visaCheck ? visaCheck.required : true;
         
         // Update visa required state
         setVisaRequired(needsVisa);
@@ -91,8 +97,8 @@ const BookingDetailsForm = ({ onContinue }: { onContinue: () => void }) => {
       }
     };
     
-    // If nationality is provided, check visa requirements
-    if (formData.nationality.length > 2) {
+    // If nationality is provided (country code is 2 chars), check visa requirements
+    if (formData.nationality.length === 2) {
       checkVisaRequirements();
     }
   }, [formData.nationality, currentBooking, setFlightBooking]);
