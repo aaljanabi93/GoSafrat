@@ -17,7 +17,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 
 // Initialize Stripe if we have the secret key
 const stripe = process.env.STRIPE_SECRET_KEY 
-  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2023-10-16" })
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2025-03-31.basil" })
   : undefined;
 
 // Travelpayouts API base URL
@@ -65,10 +65,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currency: currency
       };
 
-      // Simulation of API delay
-      setTimeout(() => {
-        res.json(sampleData);
-      }, 500);
+      // Respond directly without timeout which was causing issues
+      res.json(sampleData);
     } catch (error: any) {
       console.error("Flight search error:", error.message);
       res.status(500).json({ 

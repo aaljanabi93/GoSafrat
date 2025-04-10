@@ -25,6 +25,18 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     const html = document.documentElement;
     html.setAttribute("lang", language);
     html.setAttribute("dir", direction);
+    
+    // Add or remove RTL class for better styling support
+    if (direction === "rtl") {
+      document.body.classList.add("rtl");
+      document.body.style.fontFamily = language === "ar" ? "Cairo, sans-serif" : "";
+    } else {
+      document.body.classList.remove("rtl");
+      document.body.style.fontFamily = "";
+    }
+    
+    // Update text alignment and other RTL-specific styles
+    document.body.style.textAlign = direction === "rtl" ? "right" : "left";
   }, [language, direction]);
 
   const toggleLanguage = () => {
