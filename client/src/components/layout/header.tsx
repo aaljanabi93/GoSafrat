@@ -61,9 +61,6 @@ export default function Header() {
           <Link href="/cars" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo' : ''}`}>
             {t("Cars", "سيارات")}
           </Link>
-          <Link href="/currency-converter" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo' : ''}`}>
-            {t("Currency", "العملات")}
-          </Link>
           <Link href="/" className={`hover:text-primary transition ${language === 'ar' ? 'font-cairo' : ''}`}>
             {t("Deals", "عروض")}
           </Link>
@@ -122,9 +119,6 @@ export default function Header() {
             </Link>
             <Link href="/cars" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo' : ''}`}>
               {t("Cars", "سيارات")}
-            </Link>
-            <Link href="/currency-converter" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo' : ''}`}>
-              {t("Currency", "العملات")}
             </Link>
             <Link href="/" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo' : ''}`}>
               {t("Deals", "عروض")}
