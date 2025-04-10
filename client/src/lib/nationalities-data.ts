@@ -2,7 +2,7 @@ export interface Nationality {
   code: string;
   name: string;
   nameAr: string;
-  region: string;
+  region: "Middle East" | "North America" | "Europe" | "Asia" | "Africa" | "South America" | "Oceania";
 }
 
 export interface VisaRequirement {

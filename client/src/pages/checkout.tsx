@@ -33,7 +33,8 @@ import { api } from "@/lib/api";
 import { 
   nationalities, 
   checkVisaRequirement, 
-  getCountryCodeFromAirport 
+  getCountryCodeFromAirport,
+  type Nationality
 } from "@/lib/nationalities-data";
 
 // Initialize Stripe with the public key
@@ -70,6 +71,10 @@ const BookingDetailsForm = ({ onContinue }: { onContinue: () => void }) => {
     const checkVisaRequirements = async () => {
       setCheckingVisa(true);
       try {
+        if (currentBooking?.type !== 'flight') {
+          return;
+        }
+        
         // Get the destination country code from the arrival airport
         const destinationCode = getCountryCodeFromAirport(currentBooking.arrivalAirport);
         
@@ -83,12 +88,10 @@ const BookingDetailsForm = ({ onContinue }: { onContinue: () => void }) => {
         setVisaRequired(needsVisa);
         
         // Update booking data with visa requirement
-        if (currentBooking && currentBooking.type === 'flight') {
-          setFlightBooking({
-            ...currentBooking,
-            visaRequired: needsVisa
-          });
-        }
+        setFlightBooking({
+          ...currentBooking,
+          visaRequired: needsVisa
+        });
       } catch (error) {
         console.error("Error checking visa requirements:", error);
         setVisaRequired(null);
@@ -195,7 +198,7 @@ const BookingDetailsForm = ({ onContinue }: { onContinue: () => void }) => {
                 <Select 
                   name="nationality" 
                   value={formData.nationality}
-                  onValueChange={(value) => {
+                  onValueChange={(value: string) => {
                     setFormData(prev => ({ ...prev, nationality: value }));
                   }}
                   required
@@ -211,8 +214,8 @@ const BookingDetailsForm = ({ onContinue }: { onContinue: () => void }) => {
                       <SelectGroup>
                         <SelectLabel>{t("Middle East", "الشرق الأوسط")}</SelectLabel>
                         {nationalities
-                          .filter(n => n.region === "Middle East")
-                          .map(nationality => (
+                          .filter((n: Nationality) => n.region === "Middle East")
+                          .map((nationality: Nationality) => (
                             <SelectItem 
                               key={nationality.code} 
                               value={nationality.code}
@@ -227,8 +230,8 @@ const BookingDetailsForm = ({ onContinue }: { onContinue: () => void }) => {
                       <SelectGroup>
                         <SelectLabel>{t("Europe", "أوروبا")}</SelectLabel>
                         {nationalities
-                          .filter(n => n.region === "Europe")
-                          .map(nationality => (
+                          .filter((n: Nationality) => n.region === "Europe")
+                          .map((nationality: Nationality) => (
                             <SelectItem 
                               key={nationality.code} 
                               value={nationality.code}
@@ -243,8 +246,8 @@ const BookingDetailsForm = ({ onContinue }: { onContinue: () => void }) => {
                       <SelectGroup>
                         <SelectLabel>{t("North America", "أمريكا الشمالية")}</SelectLabel>
                         {nationalities
-                          .filter(n => n.region === "North America")
-                          .map(nationality => (
+                          .filter((n: Nationality) => n.region === "North America")
+                          .map((nationality: Nationality) => (
                             <SelectItem 
                               key={nationality.code} 
                               value={nationality.code}
