@@ -245,7 +245,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           mockFlights[i.toString()] = {
             price: price,
-            airline: airline,
+            airline: airlineCode, // Use the airline code (like EK, QR, etc.)
             flight_number: flightNumber,
             departure_at: departDate as string,
             return_at: returnDate as string,
@@ -309,18 +309,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
             estimatedDuration = `${Math.floor(Math.random() * 3) + 3}h ${Math.floor(Math.random() * 59)}m`;
           }
           
-          // Get airline details
-          const airlineInfo = (airlines as Record<string, { name: string, code: string }>)[airlineCode] || { name: airlineCode, code: airlineCode };
-          
-          // Add commonly used airline logos
-          let airlineLogo = "";
-          if (airlineCode === "EK") {
-            airlineLogo = "https://upload.wikimedia.org/wikipedia/commons/d/d0/Emirates_logo.svg";
-          } else if (airlineCode === "QR") {
-            airlineLogo = "https://upload.wikimedia.org/wikipedia/en/thumb/f/f4/Qatar_Airways_Logo.svg/1200px-Qatar_Airways_Logo.svg.png";
-          } else if (airlineCode === "RJ") {
-            airlineLogo = "https://upload.wikimedia.org/wikipedia/en/thumb/c/cb/Royal_Jordanian_Airlines_logo.svg/1200px-Royal_Jordanian_Airlines_logo.svg.png";
-          }
+          // Get airline details from our comprehensive airlines data
+          const airlineInfo = airlines[airlineCode as keyof typeof airlines] || { 
+            name: airlineCode, 
+            code: airlineCode,
+            logo: "",
+            aircraft: ["Boeing", "Airbus"],
+            alliance: "None"
+          };
           
           // Add rich information to make flight data more useful
           const enrichedFlight = {
@@ -339,16 +335,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
             },
             airline: {
               code: airlineCode,
-              name: airlineInfo.name || airlineCode,
-              nameAr: airlineInfo.name || airlineCode,
-              logo: airlineLogo,
+              name: airlineInfo.name,
+              nameAr: airlineInfo.name,
+              logo: airlineInfo.logo || "",
               flightNumber: `${airlineCode}${flight.flight_number}`,
-              aircraft: airlineCode === "EK" ? "Boeing 777" : (airlineCode === "QR" ? "Airbus A350" : "Boeing 787")
+              aircraft: airlineInfo.aircraft ? airlineInfo.aircraft[Math.floor(Math.random() * airlineInfo.aircraft.length)] : "Boeing 737",
+              alliance: airlineInfo.alliance
             },
             duration: estimatedDuration,
             baggage: {
               cabin: "7kg",
-              checked: airlineCode === "EK" ? "30kg" : "23kg"
+              checked: airlineCode === "EK" ? "30kg" : "23kg" // Emirates typically offers more generous baggage allowance
             },
             stops: [],
             direct: true,
