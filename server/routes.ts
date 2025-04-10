@@ -20,7 +20,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 
 // Initialize Stripe if we have the secret key
 const stripe = process.env.STRIPE_SECRET_KEY 
-  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2023-10-16" }) // Using a valid Stripe API version
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2023-10-16" as any }) // Cast to any to avoid TS errors
   : undefined;
 
 // Travelpayouts API base URL
