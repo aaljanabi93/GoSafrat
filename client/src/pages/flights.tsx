@@ -19,21 +19,44 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Helmet } from "react-helmet";
-import { ChevronRight, ChevronLeft, ArrowRight, ArrowLeft, Edit } from "lucide-react";
+import { ChevronRight, ChevronLeft, ArrowRight, ArrowLeft, Edit, Filter, SortDesc } from "lucide-react";
+import SearchFilters, { SearchFilters as SearchFiltersType } from "@/components/search/search-filters";
+import SearchSort, { SortOption } from "@/components/search/search-sort";
+import FlightSearch from "@/components/search/flight-search";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { getAirlineByCode } from "@/lib/airlines-data";
+import { getAirportByCode } from "@/lib/airports-data";
 
 // We'll use real flight data from the API instead of mocks
 
 export default function Flights() {
   const { t, language } = useLanguage();
   const { currentBooking, setFlightBooking } = useBooking();
-  const { formatPrice } = useCurrency();
+  const { formatPrice, currency } = useCurrency();
   const [location, navigate] = useLocation();
   const { toast } = useToast();
 
   const [flights, setFlights] = useState<any[]>([]);
-  const [sortOption, setSortOption] = useState("price-asc");
+  const [filteredFlights, setFilteredFlights] = useState<any[]>([]);
+  const [sortOption, setSortOption] = useState<SortOption>("price_asc");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+  
+  // Default filter values
+  const [filters, setFilters] = useState<SearchFiltersType>({
+    priceRange: {
+      min: 0,
+      max: 3000,
+      current: [0, 3000],
+    },
+    airlines: [],
+    stops: [],
+    departureTime: [0, 24],
+    arrivalTime: [0, 24],
+    duration: 1440, // 24 hours in minutes
+    onlyRefundable: false,
+  });
   
   // Set document title
   useEffect(() => {
@@ -138,31 +161,172 @@ export default function Flights() {
     fetchFlights();
   }, [currentBooking]);
 
+  // Apply filters to flights
+  const applyFilters = (flightsToFilter: any[], currentFilters: SearchFiltersType) => {
+    return flightsToFilter.filter(flight => {
+      // Price filter
+      if (flight.price < currentFilters.priceRange.current[0] || 
+          flight.price > currentFilters.priceRange.current[1]) {
+        return false;
+      }
+      
+      // Airline filter
+      if (currentFilters.airlines.length > 0 && 
+          !currentFilters.airlines.includes(flight.airline?.code)) {
+        return false;
+      }
+      
+      // Stops filter
+      if (currentFilters.stops.length > 0) {
+        const stopCount = flight.stops?.length || 0;
+        const matchesFilter = currentFilters.stops.some(s => {
+          if (s === 0) return stopCount === 0;
+          if (s === 1) return stopCount === 1;
+          if (s === 2) return stopCount >= 2;
+          return false;
+        });
+        if (!matchesFilter) return false;
+      }
+      
+      // Departure time filter
+      const departureHour = parseInt(flight.departure?.time?.split(':')[0] || '0');
+      if (departureHour < currentFilters.departureTime[0] || 
+          departureHour > currentFilters.departureTime[1]) {
+        return false;
+      }
+      
+      // Arrival time filter
+      const arrivalHour = parseInt(flight.arrival?.time?.split(':')[0] || '0');
+      if (arrivalHour < currentFilters.arrivalTime[0] || 
+          arrivalHour > currentFilters.arrivalTime[1]) {
+        return false;
+      }
+      
+      // Duration filter
+      let flightDuration = 0;
+      if (flight.duration) {
+        const durationMatch = flight.duration.match(/(\d+)h\s*(\d*)m?/);
+        if (durationMatch) {
+          const hours = parseInt(durationMatch[1]) || 0;
+          const mins = parseInt(durationMatch[2]) || 0;
+          flightDuration = hours * 60 + mins;
+        }
+      }
+      if (flightDuration > currentFilters.duration) {
+        return false;
+      }
+      
+      // Refundable filter
+      if (currentFilters.onlyRefundable && !flight.refundable) {
+        return false;
+      }
+      
+      return true;
+    });
+  };
+
   // Sort flights when option changes
-  const sortFlights = (flightsToSort: any[], option: string) => {
+  const sortFlights = (flightsToSort: any[], option: SortOption) => {
     let sortedFlights = [...flightsToSort];
     
-    if (option === "price-asc") {
-      sortedFlights.sort((a, b) => a.price - b.price);
-    } else if (option === "price-desc") {
-      sortedFlights.sort((a, b) => b.price - a.price);
-    } else if (option === "duration-asc") {
-      sortedFlights.sort((a, b) => {
-        const durationA = a.duration?.split('h')[0] ? parseInt(a.duration.split('h')[0]) : 0;
-        const durationB = b.duration?.split('h')[0] ? parseInt(b.duration.split('h')[0]) : 0;
-        return durationA - durationB;
-      });
+    switch (option) {
+      case "price_asc":
+        sortedFlights.sort((a, b) => a.price - b.price);
+        break;
+      case "price_desc":
+        sortedFlights.sort((a, b) => b.price - a.price);
+        break;
+      case "duration_asc":
+        sortedFlights.sort((a, b) => {
+          const durationA = parseDuration(a.duration);
+          const durationB = parseDuration(b.duration);
+          return durationA - durationB;
+        });
+        break;
+      case "departure_asc":
+        sortedFlights.sort((a, b) => {
+          const timeA = a.departure?.time || "00:00";
+          const timeB = b.departure?.time || "00:00";
+          return timeA.localeCompare(timeB);
+        });
+        break;
+      case "departure_desc":
+        sortedFlights.sort((a, b) => {
+          const timeA = a.departure?.time || "00:00";
+          const timeB = b.departure?.time || "00:00";
+          return timeB.localeCompare(timeA);
+        });
+        break;
+      case "arrival_asc":
+        sortedFlights.sort((a, b) => {
+          const timeA = a.arrival?.time || "00:00";
+          const timeB = b.arrival?.time || "00:00";
+          return timeA.localeCompare(timeB);
+        });
+        break;
+      case "arrival_desc":
+        sortedFlights.sort((a, b) => {
+          const timeA = a.arrival?.time || "00:00";
+          const timeB = b.arrival?.time || "00:00";
+          return timeB.localeCompare(timeA);
+        });
+        break;
+      case "recommended":
+        // Recommended is a composite score of price and duration
+        sortedFlights.sort((a, b) => {
+          const scoreA = a.price * 0.7 + parseDuration(a.duration) * 0.3;
+          const scoreB = b.price * 0.7 + parseDuration(b.duration) * 0.3;
+          return scoreA - scoreB;
+        });
+        break;
     }
     
-    setFlights(sortedFlights);
+    return sortedFlights;
   };
   
-  // Handle sort option change
+  // Helper function to parse duration string like "2h 30m" to minutes
+  const parseDuration = (duration: string): number => {
+    if (!duration) return 0;
+    
+    const durationMatch = duration.match(/(\d+)h\s*(\d*)m?/);
+    if (durationMatch) {
+      const hours = parseInt(durationMatch[1]) || 0;
+      const mins = parseInt(durationMatch[2]) || 0;
+      return hours * 60 + mins;
+    }
+    return 0;
+  };
+  
+  // Apply filters and sorting
   useEffect(() => {
     if (flights.length > 0) {
-      sortFlights(flights, sortOption);
+      const filtered = applyFilters(flights, filters);
+      const sorted = sortFlights(filtered, sortOption);
+      setFilteredFlights(sorted);
     }
-  }, [sortOption]);
+  }, [flights, filters, sortOption]);
+  
+  // Handle filter changes
+  const handleFilterChange = (newFilters: SearchFiltersType) => {
+    setFilters(newFilters);
+  };
+  
+  // Reset filters to default
+  const handleClearFilters = () => {
+    setFilters({
+      priceRange: {
+        min: 0,
+        max: 3000,
+        current: [0, 3000],
+      },
+      airlines: [],
+      stops: [],
+      departureTime: [0, 24],
+      arrivalTime: [0, 24],
+      duration: 1440,
+      onlyRefundable: false,
+    });
+  };
 
   const handleSelectFlight = (flight: any) => {
     // Create flight booking data from selected flight
@@ -273,25 +437,11 @@ export default function Flights() {
               </div>
               
               <div className="flex items-center space-x-2 rtl:space-x-reverse mt-2 md:mt-0">
-                <span className={`text-sm font-medium ${language === 'ar' ? 'font-cairo' : ''}`}>
-                  {t("Sort by:", "ترتيب حسب:")}
-                </span>
-                <Select value={sortOption} onValueChange={setSortOption}>
-                  <SelectTrigger className="w-[180px] border-[#051C2C] text-[#051C2C]">
-                    <SelectValue placeholder={t("Sort by", "ترتيب حسب")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="price-asc">
-                      {t("Price: Low to High", "السعر: من الأقل إلى الأعلى")}
-                    </SelectItem>
-                    <SelectItem value="price-desc">
-                      {t("Price: High to Low", "السعر: من الأعلى إلى الأقل")}
-                    </SelectItem>
-                    <SelectItem value="duration-asc">
-                      {t("Duration: Shortest", "المدة: الأقصر")}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                <SearchSort
+                  currentSort={sortOption}
+                  onSortChange={setSortOption}
+                  type="flight"
+                />
               </div>
             </div>
             
