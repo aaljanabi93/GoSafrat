@@ -28,7 +28,9 @@ export default function FlightSearch() {
   const [destination, setDestination] = useState<string>("");
   const [departureDate, setDepartureDate] = useState<Date | undefined>(undefined);
   const [returnDate, setReturnDate] = useState<Date | undefined>(undefined);
-  const [passengerCount, setPassengerCount] = useState<number>(1);
+  const [adultCount, setAdultCount] = useState<number>(1);
+  const [childCount, setChildCount] = useState<number>(0);
+  const [infantCount, setInfantCount] = useState<number>(0);
   const [cabinClass, setCabinClass] = useState<string>("economy");
   const [isPassengerOpen, setIsPassengerOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -227,8 +229,13 @@ export default function FlightSearch() {
         destination: destination,
         departDate: formattedDepartDate,
         returnDate: formattedReturnDate,
-        adults: passengerCount
+        adults: adultCount,
+        children: childCount,
+        infants: infantCount
       });
+
+      // Calculate total passengers
+      const totalPassengers = adultCount + childCount + infantCount;
 
       // Set mock booking data for demonstration
       setFlightBooking({
@@ -239,7 +246,7 @@ export default function FlightSearch() {
         arrivalCity: destination,
         arrivalAirport: destination,
         arrivalTime: formattedReturnDate || formattedDepartDate,
-        passengers: passengerCount,
+        passengers: totalPassengers,
         cabinClass: cabinClass,
         price: 549,
         returnFlight: tripType === "roundtrip",
@@ -463,31 +470,42 @@ export default function FlightSearch() {
               >
                 <User className="h-4 w-4 absolute left-3 text-gray-400" />
                 <span className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
-                  {passengerCount} {t("Adult", "بالغ")}, {cabinOptions.find(o => o.value === cabinClass)?.label}
+                  {adultCount} {t("Adult", "بالغ")}
+                  {childCount > 0 && `, ${childCount} ${t("Child", "طفل")}`}
+                  {infantCount > 0 && `, ${infantCount} ${t("Infant", "رضيع")}`}
+                  {`, ${cabinOptions.find(o => o.value === cabinClass)?.label}`}
                 </span>
                 <ChevronDown className="h-4 w-4 absolute right-3 text-gray-400" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80">
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <Label className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
-                      {t("Adults", "البالغين")}
-                    </Label>
+                {/* Adults */}
+                <div className="bg-gray-50 p-3 rounded-md">
+                  <div className="flex justify-between items-center mb-1">
+                    <div>
+                      <Label className={`text-black font-medium ${language === 'ar' ? 'font-cairo' : ''}`}>
+                        {t("Adults", "البالغين")}
+                      </Label>
+                      <p className="text-xs text-gray-500">{t("12+ years", "+12 سنة")}</p>
+                    </div>
                     <div className="flex items-center space-x-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setPassengerCount(Math.max(1, passengerCount - 1))}
+                        className="h-8 w-8 rounded-full p-0 bg-white"
+                        onClick={() => setAdultCount(Math.max(1, adultCount - 1))}
+                        disabled={adultCount <= 1}
                       >
                         -
                       </Button>
-                      <span>{passengerCount}</span>
+                      <span className="w-8 text-center text-black font-medium">{adultCount}</span>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setPassengerCount(passengerCount + 1)}
+                        className="h-8 w-8 rounded-full p-0 bg-white"
+                        onClick={() => setAdultCount(Math.min(9, adultCount + 1))}
+                        disabled={adultCount + childCount + infantCount >= 9}
                       >
                         +
                       </Button>
@@ -495,11 +513,83 @@ export default function FlightSearch() {
                   </div>
                 </div>
                 
-                <div className="space-y-2">
-                  <Label className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
+                {/* Children */}
+                <div className="bg-gray-50 p-3 rounded-md">
+                  <div className="flex justify-between items-center mb-1">
+                    <div>
+                      <Label className={`text-black font-medium ${language === 'ar' ? 'font-cairo' : ''}`}>
+                        {t("Children", "الأطفال")}
+                      </Label>
+                      <p className="text-xs text-gray-500">{t("2-11 years", "2-11 سنة")}</p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-8 rounded-full p-0 bg-white"
+                        onClick={() => setChildCount(Math.max(0, childCount - 1))}
+                        disabled={childCount <= 0}
+                      >
+                        -
+                      </Button>
+                      <span className="w-8 text-center text-black font-medium">{childCount}</span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-8 rounded-full p-0 bg-white"
+                        onClick={() => setChildCount(Math.min(8, childCount + 1))}
+                        disabled={adultCount + childCount + infantCount >= 9}
+                      >
+                        +
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Infants */}
+                <div className="bg-gray-50 p-3 rounded-md">
+                  <div className="flex justify-between items-center mb-1">
+                    <div>
+                      <Label className={`text-black font-medium ${language === 'ar' ? 'font-cairo' : ''}`}>
+                        {t("Infants", "الرضع")}
+                      </Label>
+                      <p className="text-xs text-gray-500">{t("Under 2 years", "أقل من 2 سنة")}</p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-8 rounded-full p-0 bg-white"
+                        onClick={() => setInfantCount(Math.max(0, infantCount - 1))}
+                        disabled={infantCount <= 0}
+                      >
+                        -
+                      </Button>
+                      <span className="w-8 text-center text-black font-medium">{infantCount}</span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-8 rounded-full p-0 bg-white"
+                        onClick={() => setInfantCount(Math.min(adultCount, infantCount + 1))}
+                        disabled={infantCount >= adultCount || adultCount + childCount + infantCount >= 9}
+                      >
+                        +
+                      </Button>
+                    </div>
+                  </div>
+                  {infantCount > 0 && (
+                    <p className="text-xs text-amber-600 mt-1">
+                      {t("Each infant must be accompanied by an adult", "يجب أن يكون كل رضيع مصحوبًا بشخص بالغ")}
+                    </p>
+                  )}
+                </div>
+                
+                {/* Cabin Class */}
+                <div className="bg-gray-50 p-3 rounded-md">
+                  <Label className={`text-black font-medium ${language === 'ar' ? 'font-cairo' : ''} mb-2 block`}>
                     {t("Cabin Class", "درجة المقصورة")}
                   </Label>
-                  <RadioGroup value={cabinClass} onValueChange={setCabinClass}>
+                  <RadioGroup value={cabinClass} onValueChange={setCabinClass} className="space-y-2">
                     {cabinOptions.map((option) => (
                       <div className="flex items-center space-x-2 rtl:space-x-reverse" key={option.value}>
                         <RadioGroupItem value={option.value} id={`cabin-${option.value}`} />
@@ -512,7 +602,7 @@ export default function FlightSearch() {
                 </div>
                 
                 <Button 
-                  className="w-full"
+                  className="w-full bg-[#FF6B6B] hover:bg-[#FF5A5A] text-white"
                   onClick={() => setIsPassengerOpen(false)}
                 >
                   {t("Apply", "تطبيق")}

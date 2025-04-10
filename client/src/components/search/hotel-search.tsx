@@ -28,6 +28,7 @@ export default function HotelSearch() {
   const [roomCount, setRoomCount] = useState<number>(1);
   const [adultCount, setAdultCount] = useState<number>(2);
   const [childCount, setChildCount] = useState<number>(0);
+  const [infantCount, setInfantCount] = useState<number>(0);
   const [isGuestDetailsOpen, setIsGuestDetailsOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   
