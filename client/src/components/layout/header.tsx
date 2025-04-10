@@ -121,6 +121,13 @@ export default function Header() {
             <Link href="/" className={`hover:text-primary py-2 ${language === 'ar' ? 'font-cairo' : ''}`}>
               {t("Deals", "عروض")}
             </Link>
+            
+            <div className="pt-2 border-t border-gray-100 flex items-center justify-between">
+              <span className={`text-sm text-gray-600 ${language === 'ar' ? 'font-cairo' : ''}`}>
+                {t("Currency", "العملة")}:
+              </span>
+              <CurrencySelector />
+            </div>
           </div>
         </div>
       )}

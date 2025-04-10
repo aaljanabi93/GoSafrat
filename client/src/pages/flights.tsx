@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLanguage } from "@/context/language-context";
 import { useBooking } from "@/context/booking-context";
 import { FlightBookingData } from "@/context/booking-context";
+import { useCurrency } from "@/context/currency-context";
 import { useLocation } from "wouter";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
@@ -102,6 +103,7 @@ const flightResults = [
 export default function Flights() {
   const { t, language } = useLanguage();
   const { currentBooking, setFlightBooking } = useBooking();
+  const { formatPrice } = useCurrency();
   const [location, navigate] = useLocation();
   const { toast } = useToast();
 

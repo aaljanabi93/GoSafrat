@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/context/language-context";
 import { useBooking } from "@/context/booking-context";
+import { useCurrency } from "@/context/currency-context";
 import { useLocation } from "wouter";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
@@ -256,6 +257,7 @@ const PaymentForm = ({ clientSecret }: { clientSecret: string }) => {
 export default function Checkout() {
   const { t, language } = useLanguage();
   const { currentBooking } = useBooking();
+  const { formatPrice } = useCurrency();
   const [location, navigate] = useLocation();
   const { toast } = useToast();
   
@@ -572,7 +574,7 @@ export default function Checkout() {
                           <span className={language === 'ar' ? 'font-cairo' : ''}>
                             {t("Total", "المجموع")}:
                           </span>
-                          <span className="text-primary font-bold">${currentBooking.price}</span>
+                          <span className="text-primary font-bold">{formatPrice(currentBooking.price)}</span>
                         </div>
                         
                         <p className={`text-xs text-gray-500 mt-2 ${language === 'ar' ? 'font-cairo' : ''}`}>
