@@ -354,7 +354,7 @@ export default function Checkout() {
         },
         {
           label: t("Departure", "المغادرة"),
-          value: format(new Date(currentBooking.departureTime), "PPP")
+          value: currentBooking.departureTime ? format(new Date(currentBooking.departureTime), "PPP") : currentBooking.departureTime || "-"
         },
         {
           label: t("Duration", "المدة"),
@@ -428,11 +428,11 @@ export default function Checkout() {
           },
           {
             label: t("Check-in", "تسجيل الوصول"),
-            value: format(new Date(currentBooking.checkInDate), "PPP")
+            value: currentBooking.checkInDate ? format(new Date(currentBooking.checkInDate), "PPP") : "-"
           },
           {
             label: t("Check-out", "تسجيل المغادرة"),
-            value: format(new Date(currentBooking.checkOutDate), "PPP")
+            value: currentBooking.checkOutDate ? format(new Date(currentBooking.checkOutDate), "PPP") : "-"
           },
           {
             label: t("Rooms", "الغرف"),
@@ -458,7 +458,8 @@ export default function Checkout() {
           },
           {
             label: t("Pickup Date", "تاريخ الاستلام"),
-            value: `${format(new Date(currentBooking.pickupDate), "PPP")} ${currentBooking.pickupTime}`
+            value: currentBooking.pickupDate ? 
+              `${format(new Date(currentBooking.pickupDate), "PPP")} ${currentBooking.pickupTime || ""}` : "-"
           },
           {
             label: t("Drop-off Location", "موقع التسليم"),
@@ -466,7 +467,8 @@ export default function Checkout() {
           },
           {
             label: t("Drop-off Date", "تاريخ التسليم"),
-            value: `${format(new Date(currentBooking.dropoffDate), "PPP")} ${currentBooking.dropoffTime}`
+            value: currentBooking.dropoffDate ? 
+              `${format(new Date(currentBooking.dropoffDate), "PPP")} ${currentBooking.dropoffTime || ""}` : "-"
           }
         ]
       };
@@ -485,7 +487,7 @@ export default function Checkout() {
   const stripeOptions = {
     clientSecret,
     appearance: {
-      theme: 'stripe'
+      theme: 'stripe' as const // Type assertion to make 'stripe' a literal type
     }
   };
 

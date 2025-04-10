@@ -119,7 +119,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
           
           // Get airline details
-          const airlineInfo = airlines[airlineCode] || { name: airlineCode, code: airlineCode };
+          const airlineInfo = (airlines as Record<string, { name: string, code: string }>)[airlineCode] || { name: airlineCode, code: airlineCode };
           
           // Add commonly used airline logos
           let airlineLogo = "";
