@@ -31,16 +31,24 @@ const flightResults = [
     departure: {
       time: "07:45",
       airport: "DXB",
+      city: "Dubai",
       date: "2023-09-25"
     },
     arrival: {
       time: "11:35",
-      airport: "LHR",
+      airport: "AMM",
+      city: "Amman",
       date: "2023-09-25"
     },
     duration: "7h 50m",
     direct: true,
-    price: 645
+    price: 645,
+    baggage: {
+      cabin: "7kg",
+      checked: "30kg"
+    },
+    stops: [],
+    visaRequired: true
   },
   {
     id: 2,
@@ -125,12 +133,12 @@ export default function Flights() {
 
   const handleSelectFlight = (flight: any) => {
     // Create flight booking data from selected flight
-    const bookingData = {
+    const bookingData: FlightBookingData = {
       type: "flight",
-      departureCity: currentBooking?.type === "flight" ? currentBooking.departureCity : "Dubai",
+      departureCity: flight.departure.city || (currentBooking?.type === "flight" ? currentBooking.departureCity : "Dubai"),
       departureAirport: flight.departure.airport,
       departureTime: `${flight.departure.date}T${flight.departure.time}:00`,
-      arrivalCity: currentBooking?.type === "flight" ? currentBooking.arrivalCity : "London",
+      arrivalCity: flight.arrival.city || (currentBooking?.type === "flight" ? currentBooking.arrivalCity : "Amman"),
       arrivalAirport: flight.arrival.airport,
       arrivalTime: `${flight.arrival.date}T${flight.arrival.time}:00`,
       passengers: currentBooking?.type === "flight" ? currentBooking.passengers : 1,
@@ -138,7 +146,11 @@ export default function Flights() {
       price: flight.price,
       airline: flight.airline.name,
       flightNumber: flight.airline.flightNumber,
-      returnFlight: currentBooking?.type === "flight" ? currentBooking.returnFlight : false
+      returnFlight: currentBooking?.type === "flight" ? currentBooking.returnFlight : false,
+      baggage: flight.baggage || { cabin: "7kg", checked: "20kg" },
+      stops: flight.stops || [],
+      visaRequired: flight.visaRequired,
+      duration: flight.duration
     };
     
     setFlightBooking(bookingData);

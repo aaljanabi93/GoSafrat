@@ -1,6 +1,17 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
 
 // Define booking types
+interface BaggageInfo {
+  cabin: string;
+  checked: string;
+}
+
+interface FlightStop {
+  airport: string;
+  city: string;
+  duration: string;
+}
+
 interface FlightBookingData {
   type: "flight";
   departureCity: string;
@@ -17,6 +28,10 @@ interface FlightBookingData {
   returnFlight?: boolean;
   returnDepartureTime?: string;
   returnArrivalTime?: string;
+  baggage?: BaggageInfo;
+  stops?: FlightStop[];
+  visaRequired?: boolean;
+  duration?: string;
 }
 
 interface HotelBookingData {
