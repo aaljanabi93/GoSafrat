@@ -127,6 +127,7 @@ export default function HotelSearch() {
         rooms: roomCount,
         adults: adultCount,
         children: childCount,
+        infants: infantCount,
         price: 0, // Will be set after hotel selection
       });
 
@@ -292,7 +293,10 @@ export default function HotelSearch() {
           >
             <User className="h-4 w-4 text-gray-500 mr-2" />
             <span className="text-black">
-              {adultCount} {t("Adults", "بالغين")}, {childCount} {t("Children", "أطفال")}, {roomCount} {t("Rooms", "غرف")}
+              {adultCount} {t("Adults", "بالغين")}
+              {childCount > 0 && `, ${childCount} ${t("Children", "أطفال")}`}
+              {infantCount > 0 && `, ${infantCount} ${t("Infants", "رضع")}`}
+              {`, ${roomCount} ${t("Rooms", "غرف")}`}
             </span>
             <ChevronDown className="h-4 w-4 text-gray-500 ml-auto" />
           </div>
@@ -301,92 +305,147 @@ export default function HotelSearch() {
           {isGuestDetailsOpen && (
             <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg p-4">
               <div className="space-y-4">
-                <div>
-                  <Label className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
-                    {t("Rooms", "الغرف")}
-                  </Label>
-                  <div className="flex items-center mt-1">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => setRoomCount(Math.max(1, roomCount - 1))}
-                      disabled={roomCount <= 1}
-                    >
-                      -
-                    </Button>
-                    <span className="mx-4 text-black">{roomCount}</span>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => setRoomCount(roomCount + 1)}
-                    >
-                      +
-                    </Button>
+                {/* Rooms */}
+                <div className="bg-gray-50 p-3 rounded-md">
+                  <div className="flex justify-between items-center">
+                    <Label className={`text-black font-medium ${language === 'ar' ? 'font-cairo' : ''}`}>
+                      {t("Rooms", "الغرف")}
+                    </Label>
+                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-8 rounded-full p-0 bg-white"
+                        onClick={() => setRoomCount(Math.max(1, roomCount - 1))}
+                        disabled={roomCount <= 1}
+                      >
+                        -
+                      </Button>
+                      <span className="w-8 text-center text-black font-medium">{roomCount}</span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-8 rounded-full p-0 bg-white"
+                        onClick={() => setRoomCount(Math.min(5, roomCount + 1))}
+                      >
+                        +
+                      </Button>
+                    </div>
                   </div>
                 </div>
                 
-                <div>
-                  <Label className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
-                    {t("Adults", "البالغين")}
-                  </Label>
-                  <div className="flex items-center mt-1">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => setAdultCount(Math.max(1, adultCount - 1))}
-                      disabled={adultCount <= 1}
-                    >
-                      -
-                    </Button>
-                    <span className="mx-4 text-black">{adultCount}</span>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => setAdultCount(adultCount + 1)}
-                    >
-                      +
-                    </Button>
+                {/* Adults */}
+                <div className="bg-gray-50 p-3 rounded-md">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <Label className={`text-black font-medium ${language === 'ar' ? 'font-cairo' : ''}`}>
+                        {t("Adults", "البالغين")}
+                      </Label>
+                      <p className="text-xs text-gray-500">{t("12+ years", "+12 سنة")}</p>
+                    </div>
+                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-8 rounded-full p-0 bg-white"
+                        onClick={() => setAdultCount(Math.max(1, adultCount - 1))}
+                        disabled={adultCount <= 1}
+                      >
+                        -
+                      </Button>
+                      <span className="w-8 text-center text-black font-medium">{adultCount}</span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-8 rounded-full p-0 bg-white"
+                        onClick={() => setAdultCount(Math.min(10, adultCount + 1))}
+                      >
+                        +
+                      </Button>
+                    </div>
                   </div>
                 </div>
                 
-                <div>
-                  <Label className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
-                    {t("Children", "الأطفال")}
-                  </Label>
-                  <div className="flex items-center mt-1">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => setChildCount(Math.max(0, childCount - 1))}
-                      disabled={childCount <= 0}
-                    >
-                      -
-                    </Button>
-                    <span className="mx-4 text-black">{childCount}</span>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => setChildCount(childCount + 1)}
-                    >
-                      +
-                    </Button>
+                {/* Children */}
+                <div className="bg-gray-50 p-3 rounded-md">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <Label className={`text-black font-medium ${language === 'ar' ? 'font-cairo' : ''}`}>
+                        {t("Children", "الأطفال")}
+                      </Label>
+                      <p className="text-xs text-gray-500">{t("2-11 years", "2-11 سنة")}</p>
+                    </div>
+                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-8 rounded-full p-0 bg-white"
+                        onClick={() => setChildCount(Math.max(0, childCount - 1))}
+                        disabled={childCount <= 0}
+                      >
+                        -
+                      </Button>
+                      <span className="w-8 text-center text-black font-medium">{childCount}</span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-8 rounded-full p-0 bg-white"
+                        onClick={() => setChildCount(Math.min(6, childCount + 1))}
+                      >
+                        +
+                      </Button>
+                    </div>
                   </div>
+                </div>
+                
+                {/* Infants */}
+                <div className="bg-gray-50 p-3 rounded-md">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <Label className={`text-black font-medium ${language === 'ar' ? 'font-cairo' : ''}`}>
+                        {t("Infants", "الرضع")}
+                      </Label>
+                      <p className="text-xs text-gray-500">{t("Under 2 years", "أقل من سنتين")}</p>
+                    </div>
+                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-8 rounded-full p-0 bg-white"
+                        onClick={() => setInfantCount(Math.max(0, infantCount - 1))}
+                        disabled={infantCount <= 0}
+                      >
+                        -
+                      </Button>
+                      <span className="w-8 text-center text-black font-medium">{infantCount}</span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-8 rounded-full p-0 bg-white"
+                        onClick={() => setInfantCount(Math.min(adultCount, infantCount + 1))}
+                        disabled={infantCount >= adultCount}
+                      >
+                        +
+                      </Button>
+                    </div>
+                  </div>
+                  {infantCount > 0 && (
+                    <p className="text-xs text-amber-600 mt-1">
+                      {t("Each infant must be assigned to an adult", "يجب تخصيص كل رضيع لشخص بالغ")}
+                    </p>
+                  )}
                 </div>
                 
                 <Button
-                  className="w-full mt-2"
+                  className="w-full mt-2 bg-[#FF6B6B] hover:bg-[#FF5A5A] text-white"
                   onClick={() => setIsGuestDetailsOpen(false)}
                 >
                   {t("Done", "تم")}

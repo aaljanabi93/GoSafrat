@@ -52,6 +52,7 @@ interface HotelBookingData {
   rooms: number;
   adults: number;
   children: number;
+  infants?: number;
   price: number;
 }
 
