@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/context/language-context";
-import { useBooking } from "@/context/booking-context";
+import { useBooking, AirlineInfo } from "@/context/booking-context";
 import { useCurrency } from "@/context/currency-context";
 import { useLocation } from "wouter";
 import Header from "@/components/layout/header";
@@ -566,7 +566,9 @@ export default function Checkout() {
       const details = [
         {
           label: t("Flight", "الرحلة"),
-          value: currentBooking.airline || t("Selected Flight", "الرحلة المحددة")
+          value: typeof currentBooking.airline === 'object' && currentBooking.airline && 'name' in (currentBooking.airline as object) 
+            ? (currentBooking.airline as any).name 
+            : currentBooking.airline || t("Selected Flight", "الرحلة المحددة")
         },
         {
           label: t("Flight Number", "رقم الرحلة"),
@@ -632,12 +634,18 @@ export default function Checkout() {
       return {
         title: t("Flight Booking", "حجز رحلة طيران"),
         details: details,
-        airlineLogo: currentBooking.airline === "Emirates" 
+        airlineLogo: currentBooking.airline && 
+          typeof currentBooking.airline === 'object' && 
+          'logo' in (currentBooking.airline as object)
+          ? (currentBooking.airline as AirlineInfo).logo
+          : currentBooking.airline === "Emirates" || currentBooking.airline === "EK"
           ? "https://upload.wikimedia.org/wikipedia/commons/d/d0/Emirates_logo.svg"
-          : currentBooking.airline === "British Airways"
+          : currentBooking.airline === "British Airways" || currentBooking.airline === "BA"
           ? "https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/British_Airways_Logo.svg/250px-British_Airways_Logo.svg.png"
-          : currentBooking.airline === "Qatar Airways"
+          : currentBooking.airline === "Qatar Airways" || currentBooking.airline === "QR"
           ? "https://upload.wikimedia.org/wikipedia/en/thumb/f/f4/Qatar_Airways_Logo.svg/1200px-Qatar_Airways_Logo.svg.png"
+          : currentBooking.airline === "Royal Jordanian" || currentBooking.airline === "RJ"
+          ? "https://upload.wikimedia.org/wikipedia/en/thumb/c/cb/Royal_Jordanian_Airlines_logo.svg/1200px-Royal_Jordanian_Airlines_logo.svg.png"
           : null
       };
     } else if (currentBooking.type === "hotel") {
@@ -761,7 +769,9 @@ export default function Checkout() {
                                 {detail.label}:
                               </span>
                               <span className={`text-sm font-medium text-right ml-2 ${language === 'ar' ? 'font-cairo mr-2 ml-0' : ''}`}>
-                                {detail.value}
+                                {typeof detail.value === 'object' ? 
+                                  ('name' in detail.value ? detail.value.name : JSON.stringify(detail.value)) 
+                                  : detail.value}
                               </span>
                             </div>
                           ))}
