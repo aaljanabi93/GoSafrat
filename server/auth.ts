@@ -43,12 +43,13 @@ export function setupAuth(app: Express) {
   }
 
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET,
+    secret: config.sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+      secure: config.isProduction,
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week,
+      domain: config.isProduction ? config.domain : undefined
     }
   };
 
