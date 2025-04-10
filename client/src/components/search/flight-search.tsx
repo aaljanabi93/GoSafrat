@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLanguage } from "@/context/language-context";
 import { useBooking } from "@/context/booking-context";
 import { useLocation } from "wouter";
@@ -9,10 +9,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Plane, PlaneLanding, User, ChevronDown } from "lucide-react";
+import { Calendar as CalendarIcon, Plane, PlaneLanding, User, ChevronDown, Search, X } from "lucide-react";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { airports, searchAirports, getPopularAirports, Airport } from "@/lib/airports-data";
 
 export default function FlightSearch() {
   const { t, language } = useLanguage();
@@ -32,13 +33,11 @@ export default function FlightSearch() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   
   // Airport search
-  const [originOptions, setOriginOptions] = useState<string[]>([]);
-  const [destinationOptions, setDestinationOptions] = useState<string[]>([]);
   const [showOriginOptions, setShowOriginOptions] = useState<boolean>(false);
   const [showDestinationOptions, setShowDestinationOptions] = useState<boolean>(false);
   
   // Worldwide airports
-  const airports = [
+  const airportOptions = [
     "New York (JFK)",
     "New York (LGA)",
     "London (LHR)",
@@ -148,42 +147,58 @@ export default function FlightSearch() {
     { value: "first", label: t("First Class", "الدرجة الأولى") }
   ];
 
+  // Format airport for display
+  const formatAirport = (airport: Airport): string => {
+    return `${airport.city} (${airport.code})`;
+  };
+
+  // Initialize airport data
+  const [originAirports, setOriginAirports] = useState<Airport[]>([]);
+  const [destinationAirports, setDestinationAirports] = useState<Airport[]>([]);
+
+  // Load popular airports on component mount
+  useEffect(() => {
+    const popular = getPopularAirports();
+    setOriginAirports(popular);
+    setDestinationAirports(popular);
+  }, []);
+
   // Handle airport search
   const handleSearchOrigin = (value: string) => {
     setOrigin(value);
     if (value.length > 1) {
-      const filtered = airports.filter(airport => 
-        airport.toLowerCase().includes(value.toLowerCase())
-      );
-      setOriginOptions(filtered);
-      setShowOriginOptions(filtered.length > 0);
+      const results = searchAirports(value);
+      setOriginAirports(results.slice(0, 10)); // Limit to 10 results for better UX
+      setShowOriginOptions(results.length > 0);
     } else {
-      setOriginOptions([]);
-      setShowOriginOptions(false);
+      const popular = getPopularAirports();
+      setOriginAirports(popular);
+      setShowOriginOptions(value.length > 0);
     }
   };
 
   const handleSearchDestination = (value: string) => {
     setDestination(value);
     if (value.length > 1) {
-      const filtered = airports.filter(airport => 
-        airport.toLowerCase().includes(value.toLowerCase())
-      );
-      setDestinationOptions(filtered);
-      setShowDestinationOptions(filtered.length > 0);
+      const results = searchAirports(value);
+      setDestinationAirports(results.slice(0, 10)); // Limit to 10 results for better UX
+      setShowDestinationOptions(results.length > 0);
     } else {
-      setDestinationOptions([]);
-      setShowDestinationOptions(false);
+      const popular = getPopularAirports();
+      setDestinationAirports(popular);
+      setShowDestinationOptions(value.length > 0);
     }
   };
 
-  const selectOrigin = (airport: string) => {
-    setOrigin(airport);
+  const selectOrigin = (airport: Airport) => {
+    const formattedAirport = formatAirport(airport);
+    setOrigin(formattedAirport);
     setShowOriginOptions(false);
   };
 
-  const selectDestination = (airport: string) => {
-    setDestination(airport);
+  const selectDestination = (airport: Airport) => {
+    const formattedAirport = formatAirport(airport);
+    setDestination(formattedAirport);
     setShowDestinationOptions(false);
   };
 
@@ -300,19 +315,19 @@ export default function FlightSearch() {
             )}
             
             {/* Origin Airport Search Results */}
-            {showOriginOptions && originOptions.length > 0 && (
-              <div className="absolute z-10 w-full bg-white mt-1 rounded-md border border-gray-200 shadow-lg max-h-60 overflow-y-auto">
-                {originOptions.map((airport, index) => (
+            {showOriginOptions && originAirports.length > 0 && (
+              <div className="absolute z-10 w-full bg-white mt-1 rounded-md border border-gray-200 shadow-lg max-h-60 overflow-y-auto text-black">
+                {originAirports.map((airport, index) => (
                   <div 
                     key={index}
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
                     onClick={() => selectOrigin(airport)}
                   >
-                    <div className={language === 'ar' ? 'font-cairo' : ''}>
-                      {airport}
+                    <div className={`text-gray-900 ${language === 'ar' ? 'font-cairo' : ''}`}>
+                      {airport.city}
                     </div>
-                    <div className="text-gray-500 text-xs font-medium">
-                      {airport.match(/\(([A-Z]{3})\)$/)?.[1]}
+                    <div className="text-gray-600 text-xs font-medium">
+                      {airport.code} - {airport.country}
                     </div>
                   </div>
                 ))}
