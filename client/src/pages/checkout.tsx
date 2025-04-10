@@ -482,18 +482,11 @@ export default function Checkout() {
   }
   
   // Stripe payment options
-  const stripeOptions = {
-    clientSecret,
-    appearance: {
-      theme: 'stripe' as const,
-    },
-  };
-  
   // Options for Stripe Elements when setting up the payment form
   const stripeOptions = {
     clientSecret,
     appearance: {
-      theme: 'stripe'
+      theme: 'stripe' as const
     }
   };
 
