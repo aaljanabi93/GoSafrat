@@ -5,6 +5,7 @@ import Stripe from "stripe";
 import axios from "axios";
 import { z } from "zod";
 import { insertFlightBookingSchema, insertHotelBookingSchema, insertCarRentalSchema, insertPaymentSchema } from "@shared/schema";
+import { setupAuth } from "./auth";
 
 // Import airline data from the dedicated file
 import { airlines, getAirlineCodes } from "../client/src/lib/airlines-data";
