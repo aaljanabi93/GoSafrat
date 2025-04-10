@@ -36,8 +36,8 @@ export default function FlightSearch() {
   const [showOriginOptions, setShowOriginOptions] = useState<boolean>(false);
   const [showDestinationOptions, setShowDestinationOptions] = useState<boolean>(false);
   
-  // Worldwide airports
-  const airportOptions = [
+  // Legacy airport list - will be removed after fully migrating to the new system
+  const legacyAirportOptions = [
     "New York (JFK)",
     "New York (LGA)",
     "London (LHR)",
@@ -315,7 +315,7 @@ export default function FlightSearch() {
             )}
             
             {/* Origin Airport Search Results */}
-            {showOriginOptions && originAirports.length > 0 && (
+            {showOriginOptions && (
               <div className="absolute z-10 w-full bg-white mt-1 rounded-md border border-gray-200 shadow-lg max-h-60 overflow-y-auto text-black">
                 {originAirports.map((airport, index) => (
                   <div 
@@ -360,19 +360,19 @@ export default function FlightSearch() {
             )}
             
             {/* Destination Airport Search Results */}
-            {showDestinationOptions && destinationOptions.length > 0 && (
-              <div className="absolute z-10 w-full bg-white mt-1 rounded-md border border-gray-200 shadow-lg max-h-60 overflow-y-auto">
-                {destinationOptions.map((airport, index) => (
+            {showDestinationOptions && (
+              <div className="absolute z-10 w-full bg-white mt-1 rounded-md border border-gray-200 shadow-lg max-h-60 overflow-y-auto text-black">
+                {destinationAirports.map((airport, index) => (
                   <div 
                     key={index}
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
                     onClick={() => selectDestination(airport)}
                   >
-                    <div className={language === 'ar' ? 'font-cairo' : ''}>
-                      {airport}
+                    <div className={`text-gray-900 ${language === 'ar' ? 'font-cairo' : ''}`}>
+                      {airport.city}
                     </div>
-                    <div className="text-gray-500 text-xs font-medium">
-                      {airport.match(/\(([A-Z]{3})\)$/)?.[1]}
+                    <div className="text-gray-600 text-xs font-medium">
+                      {airport.code} - {airport.country}
                     </div>
                   </div>
                 ))}

@@ -397,13 +397,9 @@ export default function Checkout() {
         });
       }
 
-      // Add visa requirement if available
-      if (currentBooking.visaRequired) {
-        details.push({
-          label: t("Visa Requirement", "متطلبات التأشيرة"),
-          value: t("Visa required for the destination", "تأشيرة مطلوبة للوجهة")
-        });
-      }
+      // Visa requirements will be shown only when user provides their nationality in the booking form
+      // This will be handled in the BookingDetailsForm component
+      // We don't show visa requirements automatically anymore since it depends on user's nationality
       
       return {
         title: t("Flight Booking", "حجز رحلة طيران"),
