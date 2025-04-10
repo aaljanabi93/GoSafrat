@@ -6,6 +6,20 @@ import axios from "axios";
 import { z } from "zod";
 import { insertFlightBookingSchema, insertHotelBookingSchema, insertCarRentalSchema, insertPaymentSchema } from "@shared/schema";
 
+// Define common airlines
+const airlines = {
+  "RJ": { name: "Royal Jordanian", code: "RJ" },
+  "EK": { name: "Emirates", code: "EK" },
+  "QR": { name: "Qatar Airways", code: "QR" },
+  "TK": { name: "Turkish Airlines", code: "TK" },
+  "GF": { name: "Gulf Air", code: "GF" },
+  "EY": { name: "Etihad Airways", code: "EY" },
+  "MS": { name: "EgyptAir", code: "MS" },
+  "LH": { name: "Lufthansa", code: "LH" },
+  "BA": { name: "British Airways", code: "BA" },
+  "AF": { name: "Air France", code: "AF" }
+};
+
 // Check for required environment variables
 if (!process.env.TRAVELPAYOUTS_MARKER || !process.env.TRAVELPAYOUTS_API_TOKEN) {
   console.warn("Missing Travelpayouts API credentials. Some functionality will not work.");
@@ -38,14 +52,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Missing required parameters" });
       }
 
-      // We'll use a predefined airlines object instead of making the API call
-
-      // Call the Travelpayouts API for flight prices
-      const apiUrl = `https://api.travelpayouts.com/v1/prices/cheap`;
-      
       // Check if we have the API token
-      if (!process.env.TRAVELPAYOUTS_API_TOKEN) {
-        console.error("Missing TRAVELPAYOUTS_API_TOKEN environment variable");
+      if (!process.env.TRAVELPAYOUTS_API_TOKEN || !process.env.TRAVELPAYOUTS_MARKER) {
+        console.error("Missing Travelpayouts API credentials");
         return res.status(500).json({
           success: false,
           error: "API configuration error",
@@ -53,15 +62,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Define common airlines for our mock data
-      const airlines = {
-        "RJ": { name: "Royal Jordanian", code: "RJ" },
-        "EK": { name: "Emirates", code: "EK" },
-        "QR": { name: "Qatar Airways", code: "QR" }
-      };
-      
-      // For testing purposes, use reliable mock data
-      // Use a type-safe structure for mock data
+      // Define type interfaces for API response and data
       interface FlightData {
         price: number;
         airline: string;
@@ -79,26 +80,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
         [destination: string]: DestinationFlights;
       }
       
-      const processedData: FlightsByDestination = {
-        "AMM": {
-          "0": {
-            price: 549,
-            airline: "RJ",
-            flight_number: 123,
-            departure_at: departDate as string,
-            return_at: returnDate as string | undefined,
-            expires_at: new Date(Date.now() + 86400000).toISOString()
-          },
-          "1": {
-            price: 649,
-            airline: "EK",
-            flight_number: 456,
-            departure_at: departDate as string,
-            return_at: returnDate as string | undefined,
-            expires_at: new Date(Date.now() + 86400000).toISOString()
-          }
+      interface TravelpayoutsResponse {
+        success: boolean;
+        data: FlightsByDestination;
+        error?: string;
+      }
+      
+      // Call the Travelpayouts API for flight prices
+      console.log(`Searching flights from ${origin} to ${destination} on ${departDate}`);
+      
+      console.log("Making API request to Travelpayouts with params:", {
+        origin,
+        destination,
+        departDate,
+        returnDate,
+        currency
+      });
+      
+      const apiResponse = await axios.get<TravelpayoutsResponse>('https://api.travelpayouts.com/v1/prices/cheap', {
+        params: {
+          origin: origin,
+          destination: destination,
+          depart_date: departDate,
+          return_date: returnDate || undefined,
+          currency: currency,
+          token: process.env.TRAVELPAYOUTS_API_TOKEN
+        },
+        headers: {
+          'X-Access-Token': process.env.TRAVELPAYOUTS_API_TOKEN
         }
-      };
+      });
+      
+      console.log("API response status:", apiResponse.status);
+      
+      if (apiResponse.data.error) {
+        console.error("API error response:", apiResponse.data.error);
+      }
+    
+      if (!apiResponse.data.success) {
+        console.error('Travelpayouts API error:', apiResponse.data.error);
+        return res.status(500).json({
+          success: false,
+          error: "API error",
+          message: apiResponse.data.error || "Unknown error from flight search API"
+        });
+      }
+      
+      const processedData = apiResponse.data.data;
+      
+      // If no flights found in the response
+      if (!processedData || Object.keys(processedData).length === 0) {
+        return res.json({
+          success: false,
+          message: "No flights found for the specified route and dates. Please try different dates or destinations."
+        });
+      }
+      
       const formattedResults: any = {};
       
       Object.keys(processedData).forEach(destCode => {
