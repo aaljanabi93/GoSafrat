@@ -270,32 +270,40 @@ export default function FlightSearch() {
     <form onSubmit={(e) => { e.preventDefault(); handleSearchFlights(); }}>
       <div className="space-y-4">
         {/* Trip Type */}
-        <RadioGroup
-          value={tripType}
-          onValueChange={setTripType}
-          className="flex space-x-4 rtl:space-x-reverse md:col-span-2 mb-4"
-        >
-          <div className="flex items-center space-x-2 rtl:space-x-reverse">
-            <RadioGroupItem value="roundtrip" id="roundtrip" />
-            <Label htmlFor="roundtrip" className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
-              {t("Round Trip", "ذهاب وعودة")}
-            </Label>
-          </div>
-          
-          <div className="flex items-center space-x-2 rtl:space-x-reverse">
-            <RadioGroupItem value="oneway" id="oneway" />
-            <Label htmlFor="oneway" className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
-              {t("One Way", "ذهاب فقط")}
-            </Label>
-          </div>
-          
-          <div className="flex items-center space-x-2 rtl:space-x-reverse">
-            <RadioGroupItem value="multicity" id="multicity" />
-            <Label htmlFor="multicity" className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
-              {t("Multi-City", "وجهات متعددة")}
-            </Label>
-          </div>
-        </RadioGroup>
+        <div className="bg-white rounded-lg p-1 inline-flex border mb-4">
+          <RadioGroup
+            value={tripType}
+            onValueChange={setTripType}
+            className="flex"
+          >
+            <div className={`px-4 py-2 rounded-lg ${tripType === "roundtrip" ? "bg-gray-100" : ""}`}>
+              <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                <RadioGroupItem value="roundtrip" id="roundtrip" className="mr-1" />
+                <Label htmlFor="roundtrip" className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
+                  {t("Round Trip", "ذهاب وعودة")}
+                </Label>
+              </div>
+            </div>
+            
+            <div className={`px-4 py-2 rounded-lg ${tripType === "oneway" ? "bg-gray-100" : ""}`}>
+              <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                <RadioGroupItem value="oneway" id="oneway" className="mr-1" />
+                <Label htmlFor="oneway" className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
+                  {t("One Way", "ذهاب فقط")}
+                </Label>
+              </div>
+            </div>
+            
+            <div className={`px-4 py-2 rounded-lg ${tripType === "multicity" ? "bg-gray-100" : ""}`}>
+              <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                <RadioGroupItem value="multicity" id="multicity" className="mr-1" />
+                <Label htmlFor="multicity" className={`text-black ${language === 'ar' ? 'font-cairo' : ''}`}>
+                  {t("Multi-City", "وجهات متعددة")}
+                </Label>
+              </div>
+            </div>
+          </RadioGroup>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* From */}
