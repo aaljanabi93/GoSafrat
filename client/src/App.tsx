@@ -11,9 +11,13 @@ import Cars from "@/pages/cars";
 import Checkout from "@/pages/checkout-fixed";
 import BookingSuccess from "@/pages/booking-success";
 import LoadingDemo from "@/pages/loading-demo";
+import AuthPage from "@/pages/auth-page";
+import ProfilePage from "@/pages/profile-page";
 import { LanguageProvider } from "@/context/language-context";
 import { BookingProvider } from "@/context/booking-context";
 import { CurrencyProvider } from "@/context/currency-context";
+import { AuthProvider } from "@/hooks/use-auth";
+import { ProtectedRoute } from "@/components/auth/protected-route";
 
 function Router() {
   return (
@@ -23,9 +27,17 @@ function Router() {
       <Route path="/flight-details/:id" component={FlightDetails} />
       <Route path="/hotels" component={Hotels} />
       <Route path="/cars" component={Cars} />
-      <Route path="/checkout" component={Checkout} />
-      <Route path="/booking-success" component={BookingSuccess} />
+      <ProtectedRoute path="/checkout">
+        <Checkout />
+      </ProtectedRoute>
+      <ProtectedRoute path="/booking-success">
+        <BookingSuccess />
+      </ProtectedRoute>
       <Route path="/loading-demo" component={LoadingDemo} />
+      <Route path="/auth" component={AuthPage} />
+      <ProtectedRoute path="/profile">
+        <ProfilePage />
+      </ProtectedRoute>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
@@ -37,10 +49,12 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <CurrencyProvider>
-          <BookingProvider>
-            <Router />
-            <Toaster />
-          </BookingProvider>
+          <AuthProvider>
+            <BookingProvider>
+              <Router />
+              <Toaster />
+            </BookingProvider>
+          </AuthProvider>
         </CurrencyProvider>
       </LanguageProvider>
     </QueryClientProvider>
