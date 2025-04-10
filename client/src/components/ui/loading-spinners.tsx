@@ -37,7 +37,7 @@ export function LoadingSpinner({
     );
   }
 
-  // Airplane spinner
+  // Airplane spinner (A380)
   if (variant === "plane") {
     return (
       <div
@@ -54,50 +54,73 @@ export function LoadingSpinner({
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
+            {/* A380 Silhouette */}
             <path
-              d="M21 16V8C21 5.79086 19.2091 4 17 4H7C4.79086 4 3 5.79086 3 8V16C3 18.2091 4.79086 20 7 20H17C19.2091 20 21 18.2091 21 16Z"
+              d="M22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12Z"
+              stroke="currentColor"
+              strokeWidth="0.5"
+              strokeOpacity="0.3"
+            />
+            {/* A380 Body */}
+            <path
+              d="M21 12H3"
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
-              strokeLinejoin="round"
+            />
+            {/* A380 Main Body */}
+            <path
+              d="M19 10C19 8.89543 18.1046 8 17 8H7C5.89543 8 5 8.89543 5 10V14C5 15.1046 5.89543 16 7 16H17C18.1046 16 19 15.1046 19 14V10Z"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            />
+            {/* Upper Deck */}
+            <path
+              d="M16 8V6.5C16 5.67157 15.3284 5 14.5 5H9.5C8.67157 5 8 5.67157 8 6.5V8"
+              stroke="currentColor"
+              strokeWidth="1"
+            />
+            {/* Wings */}
+            <path
+              d="M5 12H2"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
             />
             <path
-              d="M3 9H21"
+              d="M19 12H22"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="3"
               strokeLinecap="round"
-              strokeLinejoin="round"
+            />
+            {/* Engine 1 */}
+            <circle cx="4.5" cy="12" r="0.8" fill="currentColor" />
+            {/* Engine 2 */}
+            <circle cx="19.5" cy="12" r="0.8" fill="currentColor" />
+            {/* Engine 3 */}
+            <circle cx="7" cy="12" r="0.6" fill="currentColor" />
+            {/* Engine 4 */}
+            <circle cx="17" cy="12" r="0.6" fill="currentColor" />
+            {/* Windows */}
+            <path
+              d="M9 7H15"
+              stroke="currentColor"
+              strokeWidth="0.5"
+              strokeDasharray="0.5 0.5"
             />
             <path
-              d="M9 20V9"
+              d="M7 11H17"
               stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              strokeWidth="0.5"
+              strokeDasharray="0.5 0.5"
             />
-            <circle
-              cx="15"
-              cy="15"
-              r="2"
-              fill="none"
+            {/* Tail */}
+            <path
+              d="M12 16V18.5C12 19.3284 12.6716 20 13.5 20H14"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="1"
             />
           </svg>
-          <div className="absolute animate-pulse">
-            <svg
-              className={cn(
-                "text-primary/80",
-                size === "sm" ? "w-3 h-3" : size === "md" ? "w-5 h-5" : "w-8 h-8"
-              )}
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M9.59998 17.8C9.38328 17.8 9.17332 17.7414 8.99998 17.6333L3.0333 13.8333C2.8062 13.6843 2.64686 13.4539 2.59116 13.1913C2.53547 12.9287 2.58847 12.6551 2.7333 12.4333L4.9333 9C5.0822 8.77294 5.31252 8.61363 5.57507 8.55798C5.83761 8.50232 6.11116 8.55538 6.33332 8.7L12.3 12.5C12.5271 12.649 12.6864 12.8794 12.7421 13.142C12.7978 13.4046 12.7448 13.6782 12.6 13.9L10.4 17.3333C10.2511 17.5604 10.0208 17.7197 9.75824 17.7754C9.4957 17.8311 9.22214 17.778 9.00001 17.6333L9.59998 17.8Z" />
-              <path d="M11.03 7C10.7622 7 10.506 6.88936 10.3185 6.69999L8.01847 4.3C7.74227 4.01379 7.67606 3.59961 7.84231 3.25027C8.00856 2.90094 8.37769 2.67511 8.77997 2.66666L14.78 2.45999C15.1824 2.45129 15.5522 2.6771 15.7189 3.02672C15.8855 3.37633 15.819 3.79004 15.5425 4.07666L11.7425 7.36666C11.5547 7.83249 11.03 7.69999 11.03 7Z" />
-            </svg>
-          </div>
         </div>
       </div>
     );
