@@ -5,7 +5,7 @@ import Stripe from "stripe";
 import axios from "axios";
 import { z } from "zod";
 import { insertFlightBookingSchema, insertHotelBookingSchema, insertCarRentalSchema, insertPaymentSchema } from "@shared/schema";
-import { setupAuth } from "./auth";
+import { setupAuth, hashPassword } from "./auth";
 import { generateResetToken, sendPasswordResetEmail } from "./services/email-service";
 
 // Import airline data from the dedicated file
@@ -636,79 +636,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Forgot password - request reset token
-  app.post("/api/forgot-password", async (req, res) => {
-    try {
-      const { email } = req.body;
-      
-      if (!email) {
-        return res.status(400).json({ message: "Email is required" });
-      }
-      
-      const user = await storage.getUserByEmail(email);
-      
-      // If user exists, generate and send reset token
-      if (user) {
-        const token = generateResetToken();
-        const expiresIn = 24 * 60 * 60 * 1000; // 24 hours
-        
-        await storage.setResetToken(user.id, token, Date.now() + expiresIn);
-        
-        // Construct the base URL
-        const baseUrl = `${req.protocol}://${req.get('host')}`;
-        
-        // Send password reset email
-        await sendPasswordResetEmail(user, token, baseUrl);
-      }
-      
-      // Always return success, even if user doesn't exist (security best practice)
-      return res.status(200).json({ 
-        message: "If an account with that email exists, a password reset link has been sent to your email."
-      });
-      
-    } catch (error) {
-      console.error("Password reset error:", error);
-      return res.status(500).json({ 
-        message: "An error occurred while processing your request. Please try again later." 
-      });
-    }
-  });
-
-  // Reset password with token
-  app.post("/api/reset-password", async (req, res) => {
-    try {
-      const { token, password } = req.body;
-      
-      if (!token || !password) {
-        return res.status(400).json({ message: "Token and password are required" });
-      }
-      
-      // Find user by reset token
-      const user = await storage.getUserByResetToken(token);
-      
-      if (!user) {
-        return res.status(400).json({ message: "Invalid or expired token" });
-      }
-      
-      // Hash the new password
-      const hashedPassword = await hashPassword(password);
-      
-      // Update user with new password and clear the reset token
-      await storage.updateUser(user.id, {
-        password: hashedPassword,
-        resetToken: null,
-        resetTokenExpires: null
-      });
-      
-      return res.status(200).json({ message: "Password has been reset successfully" });
-      
-    } catch (error) {
-      console.error("Password reset error:", error);
-      return res.status(500).json({ 
-        message: "An error occurred while resetting your password. Please try again later." 
-      });
-    }
-  });
+  // These endpoints for password reset are already defined in setupAuth function
 
   const httpServer = createServer(app);
   return httpServer;
