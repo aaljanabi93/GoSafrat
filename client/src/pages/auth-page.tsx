@@ -200,6 +200,19 @@ export default function AuthPage() {
                           </FormItem>
                         )}
                       />
+                      <div className="flex justify-end mb-2">
+                        <Button 
+                          variant="link" 
+                          className="p-0 text-sm" 
+                          onClick={() => {
+                            const email = loginForm.getValues().username;
+                            setLocation(`/reset-password${email ? `?email=${encodeURIComponent(email)}` : ''}`);
+                          }}
+                        >
+                          {t("Forgot Password?", "نسيت كلمة المرور؟")}
+                        </Button>
+                      </div>
+
                       <Button 
                         type="submit" 
                         className="w-full" 

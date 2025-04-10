@@ -239,6 +239,169 @@ export function setupAuth(app: Express) {
     }
   });
 
+  // Email verification endpoint
+  app.get("/api/verify-email", async (req, res) => {
+    try {
+      const { token } = req.query;
+      
+      if (!token || typeof token !== 'string') {
+        return res.status(400).json({ message: "Invalid verification token" });
+      }
+      
+      const user = await storage.verifyEmail(token);
+      
+      if (!user) {
+        return res.status(400).json({ 
+          message: "Invalid or expired verification token",
+          error: "TOKEN_INVALID"
+        });
+      }
+      
+      // If user is already logged in, update their session
+      if (req.isAuthenticated() && req.user.id === user.id) {
+        req.user.emailVerified = true;
+      }
+      
+      res.json({ 
+        message: "Email verified successfully",
+        success: true 
+      });
+    } catch (error: unknown) {
+      console.error("Email verification error:", error);
+      if (error instanceof Error) {
+        res.status(500).json({ message: "Email verification failed", error: error.message });
+      } else {
+        res.status(500).json({ message: "Email verification failed", error: "Unknown error" });
+      }
+    }
+  });
+  
+  // Resend verification email endpoint
+  app.post("/api/resend-verification", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    
+    try {
+      // Check if email is already verified
+      if (req.user.emailVerified) {
+        return res.status(400).json({ message: "Email is already verified" });
+      }
+      
+      // Generate new verification token
+      const token = generateVerificationToken();
+      
+      // Set verification token with 24 hour expiration
+      const verificationExpiresIn = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+      await storage.setVerificationToken(req.user.id, token, verificationExpiresIn);
+      
+      // Get base URL for link construction
+      const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+      const baseUrl = `${protocol}://${req.get('host')}`;
+      
+      // Send verification email
+      const sent = await sendVerificationEmail(req.user, token, baseUrl);
+      
+      if (!sent) {
+        return res.status(500).json({ message: "Failed to send verification email" });
+      }
+      
+      res.json({ message: "Verification email sent successfully" });
+    } catch (error: unknown) {
+      console.error("Resend verification error:", error);
+      if (error instanceof Error) {
+        res.status(500).json({ message: "Failed to resend verification email", error: error.message });
+      } else {
+        res.status(500).json({ message: "Failed to resend verification email", error: "Unknown error" });
+      }
+    }
+  });
+
+  // Password reset request endpoint
+  app.post("/api/forgot-password", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+      
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      
+      // Don't reveal if user exists or not
+      if (!user) {
+        return res.json({ message: "If an account with that email exists, a password reset link has been sent" });
+      }
+      
+      // Generate reset token
+      const token = generateResetToken();
+      
+      // Set reset token with 1 hour expiration
+      const resetExpiresIn = 60 * 60 * 1000; // 1 hour in milliseconds
+      await storage.setResetToken(user.id, token, resetExpiresIn);
+      
+      // Get base URL for link construction
+      const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+      const baseUrl = `${protocol}://${req.get('host')}`;
+      
+      // Send password reset email
+      sendPasswordResetEmail(user, token, baseUrl)
+        .then(sent => {
+          if (!sent) {
+            console.error('Failed to send password reset email to:', user.email);
+          }
+        })
+        .catch(err => {
+          console.error('Error sending password reset email:', err);
+        });
+      
+      res.json({ message: "If an account with that email exists, a password reset link has been sent" });
+    } catch (error: unknown) {
+      console.error("Password reset request error:", error);
+      // Don't reveal if user exists or not
+      res.json({ message: "If an account with that email exists, a password reset link has been sent" });
+    }
+  });
+  
+  // Reset password endpoint
+  app.post("/api/reset-password", async (req, res) => {
+    try {
+      const { token, newPassword } = req.body;
+      
+      if (!token || !newPassword) {
+        return res.status(400).json({ message: "Token and new password are required" });
+      }
+      
+      // Find user by reset token
+      const user = await storage.getUserByResetToken(token);
+      
+      if (!user) {
+        return res.status(400).json({ 
+          message: "Invalid or expired reset token",
+          error: "TOKEN_INVALID"
+        });
+      }
+      
+      // Update password and clear reset token
+      const hashedNewPassword = await hashPassword(newPassword);
+      await storage.updateUser(user.id, { 
+        password: hashedNewPassword,
+        resetToken: null,
+        resetExpires: null
+      });
+      
+      res.json({ message: "Password has been reset successfully" });
+    } catch (error: unknown) {
+      console.error("Password reset error:", error);
+      if (error instanceof Error) {
+        res.status(500).json({ message: "Password reset failed", error: error.message });
+      } else {
+        res.status(500).json({ message: "Password reset failed", error: "Unknown error" });
+      }
+    }
+  });
+  
   // User bookings history endpoint
   app.get("/api/user/bookings", async (req, res) => {
     if (!req.isAuthenticated()) {

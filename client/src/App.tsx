@@ -13,6 +13,8 @@ import BookingSuccess from "@/pages/booking-success";
 import LoadingDemo from "@/pages/loading-demo";
 import AuthPage from "@/pages/auth-page";
 import ProfilePage from "@/pages/profile-page";
+import VerifyEmail from "@/pages/verify-email";
+import ResetPassword from "@/pages/reset-password";
 import { LanguageProvider } from "@/context/language-context";
 import { BookingProvider } from "@/context/booking-context";
 import { CurrencyProvider } from "@/context/currency-context";
@@ -35,6 +37,8 @@ function Router() {
       </ProtectedRoute>
       <Route path="/loading-demo" component={LoadingDemo} />
       <Route path="/auth" component={AuthPage} />
+      <Route path="/verify-email" component={VerifyEmail} />
+      <Route path="/reset-password" component={ResetPassword} />
       <ProtectedRoute path="/profile">
         <ProfilePage />
       </ProtectedRoute>
