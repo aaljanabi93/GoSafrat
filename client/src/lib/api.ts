@@ -38,6 +38,14 @@ interface CarSearchParams {
   dropoffTime?: string;
 }
 
+// Payment intent interface
+interface PaymentIntentParams {
+  amount: number;
+  currency?: string;
+  bookingType: 'flight' | 'hotel' | 'car';
+  bookingId: number;
+}
+
 // API wrapper functions
 export const api = {
   // Flight search
@@ -107,7 +115,7 @@ export const api = {
   },
 
   // Create payment intent
-  createPaymentIntent: async (paymentData: any) => {
+  createPaymentIntent: async (paymentData: PaymentIntentParams) => {
     try {
       const response = await axios.post("/api/create-payment-intent", paymentData);
       return response.data;

@@ -295,7 +295,7 @@ export default function Checkout() {
     
     setIsLoading(true);
     try {
-      let bookingType;
+      let bookingType: 'flight' | 'hotel' | 'car';
       let bookingId = 1; // Mock ID since we're using memory storage
       
       if (currentBooking.type === "flight") {
