@@ -173,27 +173,47 @@ Sitemap: https://gosafrat.com/sitemap.xml
       
       console.log(`Using extracted airport codes: from ${originCode} to ${destinationCode}`);
       
-      // If we don't get a successful response, use enhanced mock data for demonstration
-      if (!apiResponse.data || !apiResponse.data.success || !apiResponse.data.data || Object.keys(apiResponse.data.data).length === 0) {
-        console.log("No real flight data available, providing enhanced sample data");
+      // Initialize response data object
+      let flightData: TravelpayoutsResponse = {
+        success: false,
+        data: {},
+        error: "No flights found"
+      };
+      
+      try {
+        // Make API call to Travelpayouts
+        const apiResponse = await axios.get<TravelpayoutsResponse>('https://api.travelpayouts.com/v1/prices/cheap', {
+          params: {
+            origin: originCode,
+            destination: destinationCode,
+            depart_date: departDate,
+            return_date: returnDate || undefined,
+            currency: currency || "USD",
+            token: process.env.TRAVELPAYOUTS_API_TOKEN
+          },
+          headers: {
+            'X-Access-Token': process.env.TRAVELPAYOUTS_API_TOKEN
+          }
+        });
         
-        // Generate more realistic flight options (10-15 flights)
+        console.log("API response status:", apiResponse.status);
+        flightData = apiResponse.data;
+      } catch (apiError: any) {
+        console.error('Error searching flights from Travelpayouts API:', apiError.message);
+        
+        // Generate sample flight data if API call fails
+        console.log("Generating sample flight data");
+        const sampleFlights: Record<string, FlightData> = {};
+        
         // Use only airlines that exist in our comprehensive airlines object
         const airlineCodes = getAirlineCodes();
-        // Filter to only include airline codes that actually exist in our airlines object
         const validAirlineCodes = airlineCodes.filter(code => airlines[code] !== undefined);
         
-        const mockFlights: Record<string, any> = {};
+        // Include popular airlines first
+        const popularAirlines = ["EK", "RJ", "QR", "TK", "EY", "GF", "MS"];
+        const availablePopularAirlines = popularAirlines.filter(code => validAirlineCodes.includes(code));
         
         const numFlights = Math.floor(Math.random() * 6) + 10; // 10-15 flights
-        
-        // Make sure we include popular airlines first
-        const popularAirlines = ["EK", "RJ", "QR", "TK", "EY", "GF", "MS"];
-        
-        // Get available popular airlines (the ones that exist in our data)
-        const availablePopularAirlines = popularAirlines.filter(code => 
-          validAirlineCodes.includes(code)
-        );
         
         for (let i = 0; i < numFlights; i++) {
           // Use popular airlines for the first few flights, then random ones
@@ -207,44 +227,42 @@ Sitemap: https://gosafrat.com/sitemap.xml
           const flightNumber = Math.floor(Math.random() * 900) + 100;
           const price = Math.floor(Math.random() * 300) + 400; // Price between 400-700
           
-          mockFlights[i.toString()] = {
+          sampleFlights[i.toString()] = {
             price: price,
-            airline: airlineCode, // Use the airline code (like EK, QR, etc.)
+            airline: airlineCode,
             flight_number: flightNumber,
             departure_at: departDate as string,
-            return_at: returnDate as string,
+            return_at: returnDate as string || "",
             expires_at: new Date(Date.now() + 86400000).toISOString()
           };
         }
         
         // Sort flights by price
-        const sortedFlights = Object.entries(mockFlights)
+        const sortedFlights = Object.entries(sampleFlights)
           .sort(([, a], [, b]) => a.price - b.price)
           .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
         
-        // Create a mock response with the destination
-        apiResponse.data = {
+        flightData = {
           success: true,
           data: {
-            [destinationCode as string]: sortedFlights
+            [destinationCode]: sortedFlights
           }
-        } as TravelpayoutsResponse;
+        };
       }
       
-      if (apiResponse.data.error) {
-        console.error("API error response:", apiResponse.data.error);
-      }
-    
-      if (!apiResponse.data.success) {
-        console.error('Travelpayouts API error:', apiResponse.data.error);
-        return res.status(500).json({
+      // Check if we have flight data that should be processed
+      if (!flightData.success || !flightData.data || Object.keys(flightData.data).length === 0) {
+        return res.json({
           success: false,
-          error: "API error",
-          message: apiResponse.data.error || "Unknown error from flight search API"
+          message: "No flights found for the specified route and dates. Please try different dates or destinations."
         });
       }
       
-      const processedData = apiResponse.data.data;
+      if (flightData.error) {
+        console.error("API error response:", flightData.error);
+      }
+      
+      const processedData = flightData.data;
       
       // If no flights found in the response
       if (!processedData || Object.keys(processedData).length === 0) {
