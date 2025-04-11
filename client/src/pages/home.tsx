@@ -1,27 +1,42 @@
-import { useEffect } from "react";
 import { useLanguage } from "@/context/language-context";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import HeroSection from "@/components/home/hero-section";
-import { Helmet } from "react-helmet";
+import PageTitle from "@/components/seo/page-title";
+import { JsonLD, createFaqSchema } from "@/components/seo/json-ld";
 
 export default function Home() {
   const { t, language } = useLanguage();
 
-  // Set document title on component mount and language change
-  useEffect(() => {
-    document.title = t("GoSafrat - Book Flights, Hotels, and Cars", "سفرات - احجز الرحلات والفنادق والسيارات");
-  }, [language, t]);
+  // FAQ data for structured data
+  const faqData = [
+    {
+      question: t("How do I book a flight on GoSafrat?", "كيف أحجز رحلة طيران على سفرات؟"),
+      answer: t("Simply search for flights by entering your departure and arrival cities, dates, and number of passengers. Compare the results and select the flight that best suits your needs. Complete the booking by providing passenger details and payment information.", "ما عليك سوى البحث عن الرحلات الجوية بإدخال مدن المغادرة والوصول والتواريخ وعدد الركاب. قارن النتائج واختر الرحلة التي تناسب احتياجاتك بشكل أفضل. أكمل الحجز بتقديم تفاصيل الركاب ومعلومات الدفع.")
+    },
+    {
+      question: t("Can I book a hotel without booking a flight?", "هل يمكنني حجز فندق بدون حجز رحلة طيران؟"),
+      answer: t("Yes, you can book hotels separately on GoSafrat. Just navigate to the Hotels section and search for accommodations in your desired destination.", "نعم، يمكنك حجز الفنادق بشكل منفصل على سفرات. ما عليك سوى الانتقال إلى قسم الفنادق والبحث عن أماكن الإقامة في وجهتك المطلوبة.")
+    },
+    {
+      question: t("What payment methods does GoSafrat accept?", "ما هي طرق الدفع التي تقبلها سفرات؟"),
+      answer: t("GoSafrat accepts all major credit cards including Visa, Mastercard, and American Express. We also support secure online payments through Stripe.", "تقبل سفرات جميع بطاقات الائتمان الرئيسية بما في ذلك Visa و Mastercard و American Express. نحن ندعم أيضًا المدفوعات الآمنة عبر الإنترنت من خلال Stripe.")
+    }
+  ];
 
   return (
     <>
-      <Helmet>
-        <title>{t("GoSafrat - Book Flights, Hotels, and Cars", "سفرات - احجز الرحلات والفنادق والسيارات")}</title>
-        <meta name="description" content={t(
+      {/* SEO optimization */}
+      <PageTitle 
+        title={t("Book Flights, Hotels, and Cars", "احجز الرحلات والفنادق والسيارات")} 
+        description={t(
           "Book flights, hotels, and car rentals at the best prices. Find great deals on your next trip with GoSafrat.",
           "احجز الرحلات الجوية والفنادق وتأجير السيارات بأفضل الأسعار. ابحث عن صفقات رائعة لرحلتك القادمة مع سفرات."
-        )} />
-      </Helmet>
+        )} 
+      />
+      
+      {/* Add FAQ structured data */}
+      <JsonLD data={createFaqSchema(faqData)} />
       
       <div className="min-h-screen flex flex-col">
         <Header />

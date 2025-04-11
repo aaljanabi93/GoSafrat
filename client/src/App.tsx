@@ -21,6 +21,8 @@ import { BookingProvider } from "@/context/booking-context";
 import { CurrencyProvider } from "@/context/currency-context";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/components/auth/protected-route";
+import { JsonLD, organizationSchema, websiteSchema } from "@/components/seo/json-ld";
+import SitemapDebug from "@/components/seo/sitemap-generator";
 
 // Import all our new pages
 import AboutPage from "@/pages/company/about";
@@ -88,6 +90,11 @@ function App() {
         <CurrencyProvider>
           <AuthProvider>
             <BookingProvider>
+              {/* Add structured data for SEO */}
+              <JsonLD data={websiteSchema} />
+              <JsonLD data={organizationSchema} />
+              {/* In development, output site routes for debugging */}
+              {process.env.NODE_ENV === 'development' && <SitemapDebug />}
               <Router />
               <Toaster />
             </BookingProvider>

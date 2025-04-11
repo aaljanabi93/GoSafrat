@@ -37,6 +37,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
   });
+  
+  // Robots.txt endpoint
+  app.get("/robots.txt", (req, res) => {
+    const robotsTxt = `User-agent: *
+Allow: /
+Disallow: /auth
+Disallow: /checkout
+Disallow: /booking-success
+Disallow: /api/
+
+Sitemap: https://gosafrat.com/sitemap.xml
+`;
+    res.header('Content-Type', 'text/plain');
+    res.send(robotsTxt);
+  });
+
+  // Sitemap endpoint
+  app.get("/sitemap.xml", (req, res) => {
+    // Define all site routes
+    const siteRoutes = [
+      { path: '/', priority: 1.0, changefreq: 'daily' },
+      { path: '/flights', priority: 0.9, changefreq: 'daily' },
+      { path: '/hotels', priority: 0.9, changefreq: 'daily' },
+      { path: '/cars', priority: 0.9, changefreq: 'daily' },
+      { path: '/auth', priority: 0.7, changefreq: 'monthly' },
+      
+      // Company Pages
+      { path: '/company/about', priority: 0.8, changefreq: 'monthly' },
+      { path: '/company/careers', priority: 0.6, changefreq: 'weekly' },
+      { path: '/company/partners', priority: 0.6, changefreq: 'monthly' },
+      { path: '/company/press', priority: 0.7, changefreq: 'weekly' },
+      
+      // Support Pages
+      { path: '/support/help-center', priority: 0.8, changefreq: 'monthly' },
+      { path: '/support/contact', priority: 0.8, changefreq: 'monthly' },
+      { path: '/support/cancellation', priority: 0.7, changefreq: 'monthly' },
+      { path: '/support/safety', priority: 0.7, changefreq: 'monthly' },
+      
+      // Legal Pages
+      { path: '/legal/terms', priority: 0.5, changefreq: 'yearly' },
+      { path: '/legal/privacy', priority: 0.5, changefreq: 'yearly' },
+      { path: '/legal/cookies', priority: 0.5, changefreq: 'yearly' },
+    ];
+    
+    const baseUrl = 'https://gosafrat.com';
+    const currentDate = new Date().toISOString().split('T')[0];
+    
+    let sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    sitemap += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+    
+    siteRoutes.forEach(route => {
+      sitemap += '  <url>\n';
+      sitemap += `    <loc>${baseUrl}${route.path}</loc>\n`;
+      sitemap += `    <lastmod>${currentDate}</lastmod>\n`;
+      sitemap += `    <changefreq>${route.changefreq}</changefreq>\n`;
+      sitemap += `    <priority>${route.priority}</priority>\n`;
+      sitemap += '  </url>\n';
+    });
+    
+    sitemap += '</urlset>';
+    
+    res.header('Content-Type', 'application/xml');
+    res.send(sitemap);
+  });
 
   // Flight search endpoint
   app.get("/api/flights/search", async (req, res) => {
