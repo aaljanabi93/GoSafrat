@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/context/language-context";
 import { useBooking } from "@/context/booking-context";
+import { HotelBookingData } from "@/context/booking-context";
 import { useLocation } from "wouter";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
@@ -13,8 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Helmet } from "react-helmet";
 import { MapPin, Star, Edit, Wifi, Car, Coffee, Utensils } from "lucide-react";
+import PageTitle from "@/components/seo/page-title";
+import { JsonLD, createBreadcrumbSchema } from "@/components/seo/json-ld";
 
 // Mock hotel data for demonstration
 const hotelResults = [
@@ -73,10 +75,7 @@ export default function Hotels() {
   const [hotels, setHotels] = useState(hotelResults);
   const [sortOption, setSortOption] = useState("price-asc");
   
-  // Set document title
-  useEffect(() => {
-    document.title = t("Hotel Search Results - Safrat Travel", "نتائج البحث عن الفنادق - سفرات");
-  }, [language, t]);
+  // Title is now set by PageTitle component
 
   // Sort hotels when option changes
   useEffect(() => {
@@ -119,8 +118,8 @@ export default function Hotels() {
     const nights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
     
     // Create hotel booking data
-    const bookingData = {
-      type: "hotel",
+    const bookingData: HotelBookingData = {
+      type: "hotel", // Explicitly set as "hotel" literal type
       hotelName: language === 'en' ? hotel.name : hotel.nameAr,
       city: currentBooking?.type === "hotel" ? currentBooking.city : "Dubai",
       checkInDate: currentBooking?.type === "hotel" ? currentBooking.checkInDate : new Date().toISOString().split('T')[0],
@@ -135,11 +134,25 @@ export default function Hotels() {
     navigate("/checkout");
   };
 
+  // Create breadcrumb schema data for structured data
+  const breadcrumbItems = [
+    { name: t("Home", "الرئيسية"), url: "/" },
+    { name: t("Hotels", "فنادق"), url: "/hotels" }
+  ];
+
   return (
     <>
-      <Helmet>
-        <title>{t("Hotel Search Results - Safrat Travel", "نتائج البحث عن الفنادق - سفرات")}</title>
-      </Helmet>
+      {/* SEO optimization */}
+      <PageTitle 
+        title={t("Hotel Search Results - GoSafrat", "نتائج البحث عن الفنادق - سفرات")} 
+        description={t(
+          "Find and book hotels at the best rates. Browse accommodations with reviews, prices, and amenities on GoSafrat.",
+          "ابحث واحجز الفنادق بأفضل الأسعار. تصفح أماكن الإقامة مع التقييمات والأسعار والمرافق على سفرات."
+        )} 
+      />
+      
+      {/* Add breadcrumb structured data */}
+      <JsonLD data={createBreadcrumbSchema(breadcrumbItems)} />
       
       <div className="min-h-screen flex flex-col">
         <Header />

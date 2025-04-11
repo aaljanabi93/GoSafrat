@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/context/language-context";
 import { useBooking } from "@/context/booking-context";
+import { CarRentalData } from "@/context/booking-context";
 import { useLocation } from "wouter";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
@@ -13,8 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Helmet } from "react-helmet";
 import { MapPin, Users, Fuel, Cog, Edit } from "lucide-react";
+import PageTitle from "@/components/seo/page-title";
+import { JsonLD, createBreadcrumbSchema } from "@/components/seo/json-ld";
 
 // Mock car data for demonstration
 const carResults = [
@@ -79,10 +81,7 @@ export default function Cars() {
   const [cars, setCars] = useState(carResults);
   const [sortOption, setSortOption] = useState("price-asc");
   
-  // Set document title
-  useEffect(() => {
-    document.title = t("Car Rental Search Results - Safrat Travel", "نتائج البحث عن تأجير السيارات - سفرات");
-  }, [language, t]);
+  // Title is now set by PageTitle component
 
   // Sort cars when option changes
   useEffect(() => {
@@ -122,11 +121,25 @@ export default function Cars() {
     navigate("/checkout");
   };
 
+  // Create breadcrumb schema data for structured data
+  const breadcrumbItems = [
+    { name: t("Home", "الرئيسية"), url: "/" },
+    { name: t("Car Rentals", "تأجير السيارات"), url: "/cars" }
+  ];
+
   return (
     <>
-      <Helmet>
-        <title>{t("Car Rental Search Results - Safrat Travel", "نتائج البحث عن تأجير السيارات - سفرات")}</title>
-      </Helmet>
+      {/* SEO optimization */}
+      <PageTitle 
+        title={t("Car Rental Search Results - GoSafrat", "نتائج البحث عن تأجير السيارات - سفرات")} 
+        description={t(
+          "Find and book car rentals at competitive rates. Browse available vehicles by type, features, and price on GoSafrat.",
+          "ابحث واحجز سيارات بأسعار تنافسية. تصفح المركبات المتاحة حسب النوع والميزات والسعر على سفرات."
+        )} 
+      />
+      
+      {/* Add breadcrumb structured data */}
+      <JsonLD data={createBreadcrumbSchema(breadcrumbItems)} />
       
       <div className="min-h-screen flex flex-col">
         <Header />
