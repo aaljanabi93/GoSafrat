@@ -15,6 +15,33 @@ interface FlightSearchParams {
   infants?: number;
   tripClass?: string;
   currency?: string;
+  directFlights?: boolean;
+}
+
+// Flight calendar interface
+interface FlightCalendarParams {
+  origin: string;
+  destination: string;
+  departDate?: string;
+  returnDate?: string;
+  tripClass?: string;
+  currency?: string;
+}
+
+// Month matrix interface
+interface MonthMatrixParams {
+  origin: string;
+  destination: string;
+  month: string; // YYYY-MM format
+  tripClass?: string;
+  currency?: string;
+}
+
+// Latest prices interface
+interface LatestPricesParams {
+  origin: string;
+  currency?: string;
+  limit?: number;
 }
 
 // Hotel search interface
@@ -55,6 +82,51 @@ export const api = {
       return response.data;
     } catch (error) {
       console.error("Error searching flights:", error);
+      throw error;
+    }
+  },
+  
+  // Flight calendar search - for date flexibility
+  searchFlightCalendar: async (params: FlightCalendarParams) => {
+    try {
+      const response = await axios.get("/api/flights/calendar", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error searching flight calendar:", error);
+      throw error;
+    }
+  },
+  
+  // Month matrix search - for best prices in a month
+  searchMonthMatrix: async (params: MonthMatrixParams) => {
+    try {
+      const response = await axios.get("/api/flights/month-matrix", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error searching month matrix:", error);
+      throw error;
+    }
+  },
+  
+  // Get latest flight prices
+  getLatestPrices: async (params: LatestPricesParams) => {
+    try {
+      const response = await axios.get("/api/flights/latest", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error getting latest prices:", error);
+      throw error;
+    }
+  },
+  
+  // Get special offers
+  getSpecialOffers: async (currency?: string, limit?: number) => {
+    try {
+      const params = { currency, limit };
+      const response = await axios.get("/api/flights/special-offers", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error getting special offers:", error);
       throw error;
     }
   },

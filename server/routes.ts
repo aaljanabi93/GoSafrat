@@ -26,8 +26,16 @@ const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2023-10-16" as any }) // Cast to any to avoid TS errors
   : undefined;
 
-// Travelpayouts API base URL
+// Travelpayouts API base URL and endpoints
 const TRAVELPAYOUTS_API_BASE = "https://api.travelpayouts.com/v1";
+const TRAVELPAYOUTS_ENDPOINTS = {
+  CHEAP_PRICES: `${TRAVELPAYOUTS_API_BASE}/prices/cheap`,
+  DIRECT_PRICES: `${TRAVELPAYOUTS_API_BASE}/prices/direct`,
+  CALENDAR_PRICES: `${TRAVELPAYOUTS_API_BASE}/prices/calendar`,
+  MONTH_MATRIX: `${TRAVELPAYOUTS_API_BASE}/prices/month-matrix`,
+  LATEST_PRICES: `${TRAVELPAYOUTS_API_BASE}/prices/latest`,
+  SPECIAL_OFFERS: `${TRAVELPAYOUTS_API_BASE}/prices/special-offers`
+};
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication routes and middleware
@@ -181,15 +189,27 @@ Sitemap: https://gosafrat.com/sitemap.xml
       };
       
       try {
+        // Determine if we want direct flights only
+        const searchType = req.query.directFlights === 'true' ? 
+          TRAVELPAYOUTS_ENDPOINTS.DIRECT_PRICES : 
+          TRAVELPAYOUTS_ENDPOINTS.CHEAP_PRICES;
+        
         // Make API call to Travelpayouts
-        const apiResponse = await axios.get<TravelpayoutsResponse>('https://api.travelpayouts.com/v1/prices/cheap', {
+        const apiResponse = await axios.get<TravelpayoutsResponse>(searchType, {
           params: {
             origin: originCode,
             destination: destinationCode,
             depart_date: departDate,
             return_date: returnDate || undefined,
             currency: currency || "USD",
-            token: process.env.TRAVELPAYOUTS_API_TOKEN
+            token: process.env.TRAVELPAYOUTS_API_TOKEN,
+            // Add additional parameters according to Aviasales Data API documentation
+            limit: 30, // Number of results
+            page: 1, // Page number for pagination if needed
+            one_way: returnDate ? false : true, // One-way or round trip
+            trip_class: tripClass || 0, // 0 - economy, 1 - business, 2 - first class
+            // Add marker for tracking
+            marker: process.env.TRAVELPAYOUTS_MARKER
           },
           headers: {
             'X-Access-Token': process.env.TRAVELPAYOUTS_API_TOKEN
@@ -592,6 +612,187 @@ Sitemap: https://gosafrat.com/sitemap.xml
       res.status(500).json({ 
         message: "Error processing payment success", 
         error: error.message 
+      });
+    }
+  });
+
+  // Flight calendar search endpoint
+  app.get("/api/flights/calendar", async (req, res) => {
+    try {
+      const { origin, destination, departDate, returnDate, tripClass = "Y", currency = "USD" } = req.query;
+      
+      if (!origin || !destination) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Missing required parameters: origin and destination are required" 
+        });
+      }
+      
+      // Extract airport codes if needed
+      let originCode = origin as string;
+      let destinationCode = destination as string;
+      
+      const originMatch = typeof originCode === 'string' ? originCode.match(/\(([A-Z]{3})\)$/) : null;
+      if (originMatch && originMatch[1]) {
+        originCode = originMatch[1];
+      }
+      
+      const destinationMatch = typeof destinationCode === 'string' ? destinationCode.match(/\(([A-Z]{3})\)$/) : null;
+      if (destinationMatch && destinationMatch[1]) {
+        destinationCode = destinationMatch[1];
+      }
+      
+      // Make API call to Travelpayouts calendar endpoint
+      const apiResponse = await axios.get(TRAVELPAYOUTS_ENDPOINTS.CALENDAR_PRICES, {
+        params: {
+          origin: originCode,
+          destination: destinationCode,
+          depart_date: departDate,
+          return_date: returnDate,
+          calendar_type: 'departure_date', // Use departure_date or return_date
+          trip_duration: 7, // Default trip duration in days
+          currency: currency || "USD",
+          token: process.env.TRAVELPAYOUTS_API_TOKEN,
+          trip_class: tripClass || 0,
+          market: 'en', // en, ru, etc.
+          marker: process.env.TRAVELPAYOUTS_MARKER
+        },
+        headers: {
+          'X-Access-Token': process.env.TRAVELPAYOUTS_API_TOKEN
+        }
+      });
+      
+      return res.json(apiResponse.data);
+    } catch (error: any) {
+      console.error('Error searching flight calendar:', error.message);
+      return res.status(500).json({ 
+        success: false, 
+        error: "Failed to search flight calendar",
+        message: error.message 
+      });
+    }
+  });
+  
+  // Get best prices for a month (month matrix)
+  app.get("/api/flights/month-matrix", async (req, res) => {
+    try {
+      const { origin, destination, month, currency = "USD", tripClass = "Y" } = req.query;
+      
+      if (!origin || !destination || !month) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Missing required parameters: origin, destination and month are required" 
+        });
+      }
+      
+      // Extract airport codes if needed
+      let originCode = origin as string;
+      let destinationCode = destination as string;
+      
+      const originMatch = typeof originCode === 'string' ? originCode.match(/\(([A-Z]{3})\)$/) : null;
+      if (originMatch && originMatch[1]) {
+        originCode = originMatch[1];
+      }
+      
+      const destinationMatch = typeof destinationCode === 'string' ? destinationCode.match(/\(([A-Z]{3})\)$/) : null;
+      if (destinationMatch && destinationMatch[1]) {
+        destinationCode = destinationMatch[1];
+      }
+      
+      // Validate month format (YYYY-MM)
+      if (!/^\d{4}-\d{2}$/.test(month as string)) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Month must be in format YYYY-MM" 
+        });
+      }
+      
+      // Make API call to Travelpayouts month matrix endpoint
+      const apiResponse = await axios.get(TRAVELPAYOUTS_ENDPOINTS.MONTH_MATRIX, {
+        params: {
+          origin: originCode,
+          destination: destinationCode,
+          month: month,
+          currency: currency || "USD",
+          show_to_affiliates: true,
+          token: process.env.TRAVELPAYOUTS_API_TOKEN,
+          trip_class: tripClass || 0,
+          market: 'en', // en, ru, etc.
+          marker: process.env.TRAVELPAYOUTS_MARKER
+        },
+        headers: {
+          'X-Access-Token': process.env.TRAVELPAYOUTS_API_TOKEN
+        }
+      });
+      
+      return res.json(apiResponse.data);
+    } catch (error: any) {
+      console.error('Error searching month matrix:', error.message);
+      return res.status(500).json({ 
+        success: false, 
+        error: "Failed to search month matrix",
+        message: error.message 
+      });
+    }
+  });
+  
+  // Get latest flight prices
+  app.get("/api/flights/latest", async (req, res) => {
+    try {
+      const { origin, currency = "USD", limit = 30 } = req.query;
+      
+      // Get latest flight prices data
+      const apiResponse = await axios.get(TRAVELPAYOUTS_ENDPOINTS.LATEST_PRICES, {
+        params: {
+          origin: origin,
+          currency: currency || "USD",
+          limit: limit || 30,
+          period_type: 'year', // month, year
+          one_way: false,
+          token: process.env.TRAVELPAYOUTS_API_TOKEN,
+          marker: process.env.TRAVELPAYOUTS_MARKER
+        },
+        headers: {
+          'X-Access-Token': process.env.TRAVELPAYOUTS_API_TOKEN
+        }
+      });
+      
+      return res.json(apiResponse.data);
+    } catch (error: any) {
+      console.error('Error fetching latest prices:', error.message);
+      return res.status(500).json({ 
+        success: false, 
+        error: "Failed to fetch latest prices",
+        message: error.message 
+      });
+    }
+  });
+  
+  // Get special offers
+  app.get("/api/flights/special-offers", async (req, res) => {
+    try {
+      const { currency = "USD", limit = 20 } = req.query;
+      
+      // Get special offers data
+      const apiResponse = await axios.get(TRAVELPAYOUTS_ENDPOINTS.SPECIAL_OFFERS, {
+        params: {
+          currency: currency || "USD",
+          limit: limit || 20,
+          token: process.env.TRAVELPAYOUTS_API_TOKEN,
+          marker: process.env.TRAVELPAYOUTS_MARKER
+        },
+        headers: {
+          'X-Access-Token': process.env.TRAVELPAYOUTS_API_TOKEN
+        }
+      });
+      
+      return res.json(apiResponse.data);
+    } catch (error: any) {
+      console.error('Error fetching special offers:', error.message);
+      return res.status(500).json({ 
+        success: false, 
+        error: "Failed to fetch special offers",
+        message: error.message 
       });
     }
   });
