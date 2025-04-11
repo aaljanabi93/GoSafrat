@@ -7,6 +7,7 @@ import { z } from "zod";
 import { insertFlightBookingSchema, insertHotelBookingSchema, insertCarRentalSchema, insertPaymentSchema } from "@shared/schema";
 import { setupAuth, hashPassword } from "./auth";
 import { generateResetToken, sendPasswordResetEmail } from "./services/email-service";
+import path from "path";
 
 // Import airline data from the dedicated file
 import { airlines, getAirlineCodes } from "../client/src/lib/airlines-data";
