@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Travelpayouts API Constants
 const MARKER = import.meta.env.TRAVELPAYOUTS_MARKER || "621885";
-const API_TOKEN = import.meta.env.TRAVELPAYOUTS_API_TOKEN || "1c24e617a235100cf967ad3ec6e8444f";
+const API_TOKEN = import.meta.env.TRAVELPAYOUTS_API_TOKEN || "1c24e617a235100cf967ad3ec6e8444f"; // Updated token
 
 // Flight search interface
 interface FlightSearchParams {
