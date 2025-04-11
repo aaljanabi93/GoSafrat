@@ -18,7 +18,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Helmet } from "react-helmet";
 import { ChevronRight, ChevronLeft, ArrowRight, ArrowLeft, Edit, Filter, SortDesc } from "lucide-react";
 import SearchFilters, { SearchFilters as SearchFiltersType } from "@/components/search/search-filters";
 import SearchSort, { SortOption } from "@/components/search/search-sort";
@@ -26,6 +25,8 @@ import FlightSearch from "@/components/search/flight-search";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { getAirlineByCode } from "@/lib/airlines-data";
 import { getAirportByCode } from "@/lib/airports-data";
+import PageTitle from "@/components/seo/page-title";
+import { JsonLD, createBreadcrumbSchema } from "@/components/seo/json-ld";
 
 // We'll use real flight data from the API instead of mocks
 
@@ -58,10 +59,7 @@ export default function Flights() {
     onlyRefundable: false,
   });
   
-  // Set document title
-  useEffect(() => {
-    document.title = t("Flight Search Results - Safrat Travel", "نتائج البحث عن الرحلات - سفرات");
-  }, [language, t]);
+  // Title is now set by PageTitle component
 
   // Fetch flights data from API
   useEffect(() => {
@@ -356,11 +354,25 @@ export default function Flights() {
     navigate("/checkout");
   };
 
+  // Create breadcrumb schema data for structured data
+  const breadcrumbItems = [
+    { name: t("Home", "الرئيسية"), url: "/" },
+    { name: t("Flights", "رحلات"), url: "/flights" }
+  ];
+
   return (
     <>
-      <Helmet>
-        <title>{t("Flight Search Results - Safrat Travel", "نتائج البحث عن الرحلات - سفرات")}</title>
-      </Helmet>
+      {/* SEO optimization */}
+      <PageTitle 
+        title={t("Flight Search Results - GoSafrat", "نتائج البحث عن الرحلات - سفرات")} 
+        description={t(
+          "Compare and book flights at the best prices. View available flights, schedules, and prices on GoSafrat.",
+          "قارن واحجز الرحلات الجوية بأفضل الأسعار. اطلع على الرحلات المتاحة والجداول الزمنية والأسعار على سفرات."
+        )} 
+      />
+      
+      {/* Add breadcrumb structured data */}
+      <JsonLD data={createBreadcrumbSchema(breadcrumbItems)} />
       
       <div className="min-h-screen flex flex-col">
         <Header />
