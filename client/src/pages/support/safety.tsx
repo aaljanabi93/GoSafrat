@@ -14,8 +14,7 @@ import {
   Lock,
   Heart,
   ExternalLink,
-  MapPin,
-  CheckCircle
+  MapPin
 } from "lucide-react";
 
 export default function SafetyResourcesPage() {
@@ -615,7 +614,9 @@ export default function SafetyResourcesPage() {
                 <ul className={`space-y-2 ${language === 'ar' ? 'text-right' : ''}`}>
                   {category.tips.map((tip, i) => (
                     <li key={i} className={`flex items-start ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
-                      <CheckCircle className={`h-5 w-5 text-green-500 flex-shrink-0 ${language === 'ar' ? 'ml-2 mt-0.5' : 'mr-2 mt-0.5'}`} />
+                      <div className={`h-5 w-5 text-green-500 flex-shrink-0 rounded-full border border-green-500 flex items-center justify-center ${language === 'ar' ? 'ml-2 mt-0.5' : 'mr-2 mt-0.5'}`}>
+                        <div className="h-3 w-3 bg-green-500 rounded-full"></div>
+                      </div>
                       <span className={`text-gray-700 ${language === 'ar' ? 'font-cairo' : ''}`}>
                         {t(tip, category.tipsAr[i])}
                       </span>
