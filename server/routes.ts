@@ -157,32 +157,21 @@ Sitemap: https://gosafrat.com/sitemap.xml
       });
       
       // Extract the airport code if it's in the format "City (XXX)"
-      const originCode = (origin as string).match(/\(([A-Z]{3})\)$/) 
-        ? (origin as string).match(/\(([A-Z]{3})\)$/)?.[1]
-        : origin;
-        
-      const destinationCode = (destination as string).match(/\(([A-Z]{3})\)$/)
-        ? (destination as string).match(/\(([A-Z]{3})\)$/)?.[1]
-        : destination;
+      // Make sure we handle both "City (XXX)" format and direct airport codes
+      let originCode = origin as string;
+      let destinationCode = destination as string;
+      
+      const originMatch = typeof originCode === 'string' ? originCode.match(/\(([A-Z]{3})\)$/) : null;
+      if (originMatch && originMatch[1]) {
+        originCode = originMatch[1];
+      }
+      
+      const destinationMatch = typeof destinationCode === 'string' ? destinationCode.match(/\(([A-Z]{3})\)$/) : null;
+      if (destinationMatch && destinationMatch[1]) {
+        destinationCode = destinationMatch[1];
+      }
       
       console.log(`Using extracted airport codes: from ${originCode} to ${destinationCode}`);
-      
-      // Making the real API call to Travelpayouts
-      const apiResponse = await axios.get<TravelpayoutsResponse>('https://api.travelpayouts.com/v1/prices/cheap', {
-        params: {
-          origin: originCode,
-          destination: destinationCode,
-          depart_date: departDate,
-          return_date: returnDate || undefined,
-          currency: currency || "USD",
-          token: process.env.TRAVELPAYOUTS_API_TOKEN
-        },
-        headers: {
-          'X-Access-Token': process.env.TRAVELPAYOUTS_API_TOKEN
-        }
-      });
-      
-      console.log("API response status:", apiResponse.status);
       
       // If we don't get a successful response, use enhanced mock data for demonstration
       if (!apiResponse.data || !apiResponse.data.success || !apiResponse.data.data || Object.keys(apiResponse.data.data).length === 0) {
