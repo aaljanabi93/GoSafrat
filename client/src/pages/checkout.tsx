@@ -20,7 +20,8 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Helmet } from "react-helmet";
+import PageTitle from "@/components/seo/page-title";
+import { JsonLD, createBreadcrumbSchema } from "@/components/seo/json-ld";
 import { format } from "date-fns";
 import { 
   Elements, 
@@ -505,10 +506,7 @@ export default function Checkout() {
     }
   }, [currentBooking, navigate, toast, t]);
   
-  // Set document title
-  useEffect(() => {
-    document.title = t("Checkout - Safrat Travel", "الدفع - سفرات");
-  }, [language, t]);
+  // Title is now set by PageTitle component
   
   // Create payment intent when moving to payment step
   useEffect(() => {
@@ -724,11 +722,38 @@ export default function Checkout() {
     }
   };
 
+  // Create breadcrumb schema data for structured data
+  const breadcrumbItems = [
+    { name: t("Home", "الرئيسية"), url: "/" },
+    { name: t("Checkout", "الدفع"), url: "/checkout" }
+  ];
+
+  // Add the previous page to breadcrumbs based on booking type
+  if (currentBooking) {
+    breadcrumbItems.splice(1, 0, {
+      name: 
+        currentBooking.type === "flight" 
+          ? t("Flights", "رحلات الطيران") 
+          : currentBooking.type === "hotel" 
+            ? t("Hotels", "الفنادق")
+            : t("Car Rentals", "تأجير السيارات"),
+      url: `/${currentBooking.type}s`
+    });
+  }
+
   return (
     <>
-      <Helmet>
-        <title>{t("Checkout - Safrat Travel", "الدفع - سفرات")}</title>
-      </Helmet>
+      {/* SEO optimization */}
+      <PageTitle 
+        title={t("Checkout - GoSafrat", "الدفع - سفرات")} 
+        description={t(
+          "Complete your travel booking securely. Review your selection, enter your details, and make payment on GoSafrat.",
+          "أكمل حجز سفرك بأمان. راجع اختيارك، وأدخل بياناتك، وقم بالدفع على سفرات."
+        )} 
+      />
+      
+      {/* Add structured data */}
+      <JsonLD data={createBreadcrumbSchema(breadcrumbItems)} />
       
       <div className="min-h-screen flex flex-col">
         <Header />
