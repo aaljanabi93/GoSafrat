@@ -96,7 +96,13 @@ export default function Flights() {
         });
 
         if (!response.success) {
-          throw new Error(response.message || "Failed to fetch flights");
+          console.log("API returned no success, response:", response);
+          // Instead of throwing an error, set empty flights and show a message to the user
+          setFlights([]);
+          setFilteredFlights([]);
+          setIsLoading(false);
+          setError(response.message || "No flights found for this route and date. Please try a different search.");
+          return;
         }
 
         // Process API response to our required format
