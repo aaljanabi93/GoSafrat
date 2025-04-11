@@ -12,8 +12,11 @@ import path from "path";
 // Import airline data from the dedicated file
 import { airlines, getAirlineCodes } from "../client/src/lib/airlines-data";
 
-// Check for required environment variables
-if (!process.env.TRAVELPAYOUTS_MARKER || !process.env.TRAVELPAYOUTS_API_TOKEN) {
+// Check for required environment variables and provide fallback for development
+const TRAVELPAYOUTS_MARKER = process.env.TRAVELPAYOUTS_MARKER || "621885";
+const TRAVELPAYOUTS_API_TOKEN = process.env.TRAVELPAYOUTS_API_TOKEN || "1c24e617a235100cf967ad3ec6e8444f";
+
+if (!TRAVELPAYOUTS_MARKER || !TRAVELPAYOUTS_API_TOKEN) {
   console.warn("Missing Travelpayouts API credentials. Some functionality will not work.");
 }
 
@@ -194,6 +197,16 @@ Sitemap: https://gosafrat.com/sitemap.xml
           TRAVELPAYOUTS_ENDPOINTS.DIRECT_PRICES : 
           TRAVELPAYOUTS_ENDPOINTS.CHEAP_PRICES;
         
+        console.log("Making API request with params:", {
+          origin: originCode,
+          destination: destinationCode,
+          depart_date: departDate,
+          return_date: returnDate,
+          currency,
+          token: TRAVELPAYOUTS_API_TOKEN,
+          marker: TRAVELPAYOUTS_MARKER
+        });
+
         // Make API call to Travelpayouts
         const apiResponse = await axios.get<TravelpayoutsResponse>(searchType, {
           params: {
@@ -202,14 +215,13 @@ Sitemap: https://gosafrat.com/sitemap.xml
             depart_date: departDate,
             return_date: returnDate || undefined,
             currency: currency || "USD",
-            token: process.env.TRAVELPAYOUTS_API_TOKEN,
-            // Add additional parameters according to Aviasales Data API documentation
-            limit: 30, // Number of results
-            page: 1, // Page number for pagination if needed
-            one_way: returnDate ? false : true, // One-way or round trip
-            trip_class: tripClass || 0, // 0 - economy, 1 - business, 2 - first class
-            // Add marker for tracking
-            marker: process.env.TRAVELPAYOUTS_MARKER
+            token: TRAVELPAYOUTS_API_TOKEN,
+            limit: 30,
+            page: 1,
+            one_way: returnDate ? false : true,
+            trip_class: tripClass || 0,
+            marker: TRAVELPAYOUTS_MARKER,
+            show_to_affiliates: true
           },
           headers: {
             'X-Access-Token': process.env.TRAVELPAYOUTS_API_TOKEN
