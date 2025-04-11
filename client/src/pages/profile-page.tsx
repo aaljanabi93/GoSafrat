@@ -10,6 +10,8 @@ import { User } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Save, UserCircle } from "lucide-react";
 import { useLocation } from "wouter";
+import PageTitle from "@/components/seo/page-title";
+import { JsonLD, createBreadcrumbSchema } from "@/components/seo/json-ld";
 
 import {
   Form,
@@ -162,19 +164,38 @@ export default function ProfilePage() {
     );
   }
 
+  // Create breadcrumb schema data for structured data
+  const breadcrumbItems = [
+    { name: t("Home", "الرئيسية"), url: "/" },
+    { name: t("My Profile", "ملفي الشخصي"), url: "/profile" }
+  ];
+
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex items-center mb-8">
-        <UserCircle className="h-12 w-12 text-primary mr-4" />
-        <div>
-          <h1 className={`text-2xl font-bold ${language === 'ar' ? 'font-cairo' : ''}`}>
-            {t("My Profile", "ملفي الشخصي")}
-          </h1>
-          <p className={`text-gray-500 ${language === 'ar' ? 'font-cairo' : ''}`}>
-            {t("Manage your account and bookings", "إدارة حسابك وحجوزاتك")}
-          </p>
+    <>
+      {/* SEO optimization */}
+      <PageTitle 
+        title={t("My Profile - GoSafrat", "ملفي الشخصي - سفرات")} 
+        description={t(
+          "Manage your GoSafrat account, view your travel bookings, update personal information, and change your security settings.",
+          "إدارة حسابك في سفرات، عرض حجوزات سفرك، تحديث معلوماتك الشخصية، وتغيير إعدادات الأمان الخاصة بك."
+        )} 
+      />
+      
+      {/* Add structured data */}
+      <JsonLD data={createBreadcrumbSchema(breadcrumbItems)} />
+      
+      <div className="container mx-auto py-8 px-4">
+        <div className="flex items-center mb-8">
+          <UserCircle className="h-12 w-12 text-primary mr-4" />
+          <div>
+            <h1 className={`text-2xl font-bold ${language === 'ar' ? 'font-cairo' : ''}`}>
+              {t("My Profile", "ملفي الشخصي")}
+            </h1>
+            <p className={`text-gray-500 ${language === 'ar' ? 'font-cairo' : ''}`}>
+              {t("Manage your account and bookings", "إدارة حسابك وحجوزاتك")}
+            </p>
+          </div>
         </div>
-      </div>
 
       <Tabs 
         defaultValue="profile" 
@@ -514,5 +535,6 @@ export default function ProfilePage() {
         </TabsContent>
       </Tabs>
     </div>
+    </>
   );
 }
