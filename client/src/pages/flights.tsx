@@ -335,29 +335,9 @@ export default function Flights() {
   };
 
   const handleSelectFlight = (flight: any) => {
-    // Create flight booking data from selected flight
-    const bookingData: FlightBookingData = {
-      type: "flight",
-      departureCity: flight.departure.city || (currentBooking?.type === "flight" ? currentBooking.departureCity : "Dubai"),
-      departureAirport: flight.departure.airport,
-      departureTime: `${flight.departure.date}T${flight.departure.time}:00`,
-      arrivalCity: flight.arrival.city || (currentBooking?.type === "flight" ? currentBooking.arrivalCity : "Amman"),
-      arrivalAirport: flight.arrival.airport,
-      arrivalTime: `${flight.arrival.date}T${flight.arrival.time}:00`,
-      passengers: currentBooking?.type === "flight" ? currentBooking.passengers : 1,
-      cabinClass: currentBooking?.type === "flight" ? currentBooking.cabinClass : "economy",
-      price: flight.price,
-      airline: flight.airline.name,
-      flightNumber: flight.airline.flightNumber,
-      returnFlight: currentBooking?.type === "flight" ? currentBooking.returnFlight : false,
-      baggage: flight.baggage || { cabin: "7kg", checked: "20kg" },
-      stops: flight.stops || [],
-      visaRequired: flight.visaRequired,
-      duration: flight.duration
-    };
-    
-    setFlightBooking(bookingData);
-    navigate("/checkout");
+    // Save the flight data in history state for the details page
+    window.history.pushState({ flight }, "", `/flight-details/${flight.id || Math.random().toString(36).substring(2, 10)}`);
+    navigate(`/flight-details/${flight.id || Math.random().toString(36).substring(2, 10)}`);
   };
 
   // Create breadcrumb schema data for structured data
